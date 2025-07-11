@@ -1,23 +1,21 @@
 const std = @import("std");
 const Emoji = @import("emoji.zig").Emoji;
 const Allocator = std.mem.Allocator;
+const Emojis = @import("emoji-slice.zig").Emojis;
 
 pub fn main() !void {
-    const gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
 
-    const input = try std.fs.cwd().openFile("input.tsv", .{});
-    defer input.close();
+    const emojis = Emojis.init(allocator, "input.tsv") catch |err| {
+        std.debug.print("Error initializing Emojis: {}\n", .{err});
+        return err;
+    };
 
-    var buf_reader = std.io.bufferedReader(input.reader());
-    var in_stream = buf_reader.reader();
-
-    var buf: [2048]u8 = undefined;
-
-    while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
-        const emoji = Emoji.fromLine(line, allocator);
-
-        std.debug.print("Emoji: {any}", .{emoji});
+    for (emojis.emojis) |emoji| {
+        std.debug.print("Emoji: {s}\tCategory: {s}\tSubcategory: {s}\tName: {s}\t", 
+            .{emoji.character, emoji.category, emoji.subcategory, emoji.name});
+        std.debug.print("Keywords: {s}\n", .{try std.mem.join(allocator, ", ", emoji.keywords)});
     }
 }
 

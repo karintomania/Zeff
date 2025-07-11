@@ -2,7 +2,7 @@ const std = @import("std");
 const ArrayList = std.ArrayList;
 const Allocator = std.mem.Allocator;
 
-const Emoji = struct {
+pub const Emoji = struct {
     character: []const u8,
     category: []const u8,
     subcategory: []const u8,
@@ -13,10 +13,10 @@ const Emoji = struct {
     pub fn fromLine(line: []const u8, allocator: Allocator) !Emoji {
         var parts = std.mem.splitSequence(u8, line, "\t");
 
-        const character = parts.next() orelse return error.InvalidFormat;
-        const category = parts.next() orelse return error.InvalidFormat;
-        const subcategory = parts.next() orelse return error.InvalidFormat;
-        const name = parts.next() orelse return error.InvalidFormat;
+        const character = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
+        const category = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
+        const subcategory = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
+        const name = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
         const keywords_str = parts.next() orelse return error.InvalidFormat;
         const skin_tones_str = parts.next() orelse "";
 
@@ -34,6 +34,18 @@ const Emoji = struct {
     }
 
     pub fn deinit(self: Emoji, allocator: Allocator) void {
+        allocator.free(self.character);
+        allocator.free(self.category);
+        allocator.free(self.subcategory);
+        allocator.free(self.name);
+        
+        for(self.keywords) |keyword| {
+            allocator.free(keyword);
+        }
+
+        for(self.skin_tones) |skin_tone| {
+            allocator.free(skin_tone);
+        }
         allocator.free(self.keywords);
         allocator.free(self.skin_tones);
     }
@@ -47,7 +59,9 @@ fn splitStringToArrayList(str: []const u8, delimiter: []const u8, allocator: All
 
     while (parts.next()) |part| {
         if (part.len == 0) continue; // Skip empty parts
-        try list.append(part);
+
+        const allocated_part = try allocator.dupe(u8, part);
+        try list.append(allocated_part);
     }
 
     return list;
@@ -64,6 +78,8 @@ test "splitStringToArrayList" {
 
     for (0..result.items.len) |i| {
         try std.testing.expectEqualSlices(u8, expected[i], result.items[i]);
+
+        defer allocator.free(result.items[i]);
     }
 }
 

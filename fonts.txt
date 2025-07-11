@@ -1,0 +1,822 @@
+Abyssinica SIL
+  Abyssinica SIL
+
+Ani
+  Ani
+
+AnjaliOldLipi
+  AnjaliOldLipi
+
+Bitstream Charter
+  Bitstream Charter Bold
+  Bitstream Charter Bold Italic
+  Bitstream Charter Italic
+  Bitstream Charter Regular
+
+C059
+  C059 Bold
+  C059 Bold Italic
+  C059 Italic
+  C059 Roman
+  C059-BdIta
+  C059-Bold
+  C059-Italic
+  C059-Roman
+
+Chandas
+  Chandas
+
+Chilanka
+  Chilanka Regular
+
+Courier 10 Pitch
+  Courier 10 Pitch Bold
+  Courier 10 Pitch Bold Italic
+  Courier 10 Pitch Italic
+  Courier 10 Pitch Regular
+
+D050000L
+  D050000L
+  D050000L Regular
+
+DejaVu Sans
+  DejaVu Sans
+  DejaVu Sans Bold
+
+DejaVu Sans Mono
+  DejaVu Sans Mono
+  DejaVu Sans Mono Bold
+
+DejaVu Serif
+  DejaVu Serif
+  DejaVu Serif Bold
+
+Dhurjati
+  Dhurjati
+
+Droid Sans Fallback
+  Droid Sans Fallback
+
+Dyuthi
+  Dyuthi
+
+FreeMono
+  FreeMono
+  FreeMono Bold
+  FreeMono Bold Oblique
+  FreeMono Oblique
+
+FreeSans
+  FreeSans
+  FreeSans Bold
+  FreeSans Bold Oblique
+  FreeSans Oblique
+
+FreeSerif
+  FreeSerif
+  FreeSerif Bold
+  FreeSerif Bold Italic
+  FreeSerif Italic
+
+Gargi
+  Gargi
+
+Garuda
+  Garuda
+  Garuda Bold
+  Garuda Bold Oblique
+  Garuda Oblique
+
+Gayathri
+  Gayathri
+  Gayathri Bold
+  Gayathri Regular
+
+Gidugu
+  Gidugu
+
+Gubbi
+  Gubbi
+
+Gurajada
+  Gurajada
+
+Jamrul
+  Jamrul
+
+JetBrainsMono Nerd Font
+  JetBrainsMono NF Bold
+  JetBrainsMono NF Bold Italic
+  JetBrainsMono NF ExtraBold
+  JetBrainsMono NF ExtraBold Italic
+  JetBrainsMono NF ExtraLight
+  JetBrainsMono NF ExtraLight Italic
+  JetBrainsMono NF Italic
+  JetBrainsMono NF Light
+  JetBrainsMono NF Light Italic
+  JetBrainsMono NF Medium
+  JetBrainsMono NF Medium Italic
+  JetBrainsMono NF Regular
+  JetBrainsMono NF SemiBold
+  JetBrainsMono NF SemiBold Italic
+  JetBrainsMono NF Thin
+  JetBrainsMono NF Thin Italic
+
+JetBrainsMono Nerd Font Mono
+  JetBrainsMono NFM Bold
+  JetBrainsMono NFM Bold Italic
+  JetBrainsMono NFM ExtraBold
+  JetBrainsMono NFM ExtraBold Italic
+  JetBrainsMono NFM ExtraLight
+  JetBrainsMono NFM ExtraLight Italic
+  JetBrainsMono NFM Italic
+  JetBrainsMono NFM Light
+  JetBrainsMono NFM Light Italic
+  JetBrainsMono NFM Medium
+  JetBrainsMono NFM Medium Italic
+  JetBrainsMono NFM Regular
+  JetBrainsMono NFM SemiBold
+  JetBrainsMono NFM SemiBold Italic
+  JetBrainsMono NFM Thin
+  JetBrainsMono NFM Thin Italic
+
+JetBrainsMono Nerd Font Propo
+  JetBrainsMono NFP Bold
+  JetBrainsMono NFP Bold Italic
+  JetBrainsMono NFP ExtraBold
+  JetBrainsMono NFP ExtraBold Italic
+  JetBrainsMono NFP ExtraLight
+  JetBrainsMono NFP ExtraLight Italic
+  JetBrainsMono NFP Italic
+  JetBrainsMono NFP Light
+  JetBrainsMono NFP Light Italic
+  JetBrainsMono NFP Medium
+  JetBrainsMono NFP Medium Italic
+  JetBrainsMono NFP Regular
+  JetBrainsMono NFP SemiBold
+  JetBrainsMono NFP SemiBold Italic
+  JetBrainsMono NFP Thin
+  JetBrainsMono NFP Thin Italic
+
+JetBrainsMonoNL Nerd Font
+  JetBrainsMonoNL NF Bold
+  JetBrainsMonoNL NF Bold Italic
+  JetBrainsMonoNL NF ExtraBold
+  JetBrainsMonoNL NF ExtraBold Italic
+  JetBrainsMonoNL NF ExtraLight
+  JetBrainsMonoNL NF ExtraLight Italic
+  JetBrainsMonoNL NF Italic
+  JetBrainsMonoNL NF Light
+  JetBrainsMonoNL NF Light Italic
+  JetBrainsMonoNL NF Medium
+  JetBrainsMonoNL NF Medium Italic
+  JetBrainsMonoNL NF Regular
+  JetBrainsMonoNL NF SemiBold
+  JetBrainsMonoNL NF SemiBold Italic
+  JetBrainsMonoNL NF Thin
+  JetBrainsMonoNL NF Thin Italic
+
+JetBrainsMonoNL Nerd Font Mono
+  JetBrainsMonoNL NFM Bold
+  JetBrainsMonoNL NFM Bold Italic
+  JetBrainsMonoNL NFM ExtraBold
+  JetBrainsMonoNL NFM ExtraBold Italic
+  JetBrainsMonoNL NFM ExtraLight
+  JetBrainsMonoNL NFM ExtraLight Italic
+  JetBrainsMonoNL NFM Italic
+  JetBrainsMonoNL NFM Light
+  JetBrainsMonoNL NFM Light Italic
+  JetBrainsMonoNL NFM Medium
+  JetBrainsMonoNL NFM Medium Italic
+  JetBrainsMonoNL NFM Regular
+  JetBrainsMonoNL NFM SemiBold
+  JetBrainsMonoNL NFM SemiBold Italic
+  JetBrainsMonoNL NFM Thin
+  JetBrainsMonoNL NFM Thin Italic
+
+JetBrainsMonoNL Nerd Font Propo
+  JetBrainsMonoNL NFP Bold
+  JetBrainsMonoNL NFP Bold Italic
+  JetBrainsMonoNL NFP ExtraBold
+  JetBrainsMonoNL NFP ExtraBold Italic
+  JetBrainsMonoNL NFP ExtraLight
+  JetBrainsMonoNL NFP ExtraLight Italic
+  JetBrainsMonoNL NFP Italic
+  JetBrainsMonoNL NFP Light
+  JetBrainsMonoNL NFP Light Italic
+  JetBrainsMonoNL NFP Medium
+  JetBrainsMonoNL NFP Medium Italic
+  JetBrainsMonoNL NFP Regular
+  JetBrainsMonoNL NFP SemiBold
+  JetBrainsMonoNL NFP SemiBold Italic
+  JetBrainsMonoNL NFP Thin
+  JetBrainsMonoNL NFP Thin Italic
+
+KacstArt
+  KacstArt
+
+KacstBook
+  KacstBook
+
+KacstDecorative
+  KacstDecorative
+
+KacstDigital
+  KacstDigital
+
+KacstFarsi
+  KacstFarsi
+
+KacstLetter
+  KacstLetter
+
+KacstNaskh
+  KacstNaskh
+
+KacstOffice
+  KacstOffice
+
+KacstOne
+  KacstOne
+  KacstOne Bold
+
+KacstPen
+  KacstPen
+
+KacstPoster
+  KacstPoster
+
+KacstQurn
+  KacstQurn
+
+KacstScreen
+  KacstScreen
+
+KacstTitle
+  KacstTitle
+
+KacstTitleL
+  KacstTitleL
+
+Kalapi
+  Kalapi
+
+Kalimati
+  Kalimati
+
+Karumbi
+  Karumbi
+
+Keraleeyam
+  Keraleeyam Regular
+
+Khmer OS
+  Khmer OS
+
+Khmer OS System
+  Khmer OS System
+
+Kinnari
+  Kinnari
+  Kinnari Bold
+  Kinnari Bold Italic
+  Kinnari Bold Oblique
+  Kinnari Italic
+  Kinnari Oblique
+
+LKLUG
+  LKLUG
+
+LakkiReddy
+  LakkiReddy
+
+Laksaman
+  Laksaman
+  Laksaman Bold
+  Laksaman Bold Italic
+  Laksaman Italic
+
+Liberation Mono
+  Liberation Mono
+  Liberation Mono
+  Liberation Mono Bold
+  Liberation Mono Bold
+  Liberation Mono Bold Italic
+  Liberation Mono Bold Italic
+  Liberation Mono Italic
+  Liberation Mono Italic
+
+Liberation Sans
+  Liberation Sans
+  Liberation Sans
+  Liberation Sans Bold
+  Liberation Sans Bold
+  Liberation Sans Bold Italic
+  Liberation Sans Bold Italic
+  Liberation Sans Italic
+  Liberation Sans Italic
+
+Liberation Sans Narrow
+  Liberation Sans Narrow
+  Liberation Sans Narrow Bold
+  Liberation Sans Narrow Bold Italic
+  Liberation Sans Narrow Italic
+
+Liberation Serif
+  Liberation Serif
+  Liberation Serif
+  Liberation Serif Bold
+  Liberation Serif Bold
+  Liberation Serif Bold Italic
+  Liberation Serif Bold Italic
+  Liberation Serif Italic
+  Liberation Serif Italic
+
+Likhan
+  Likhan
+
+Lohit Assamese
+  Lohit Assamese
+
+Lohit Bengali
+  Lohit Bengali
+
+Lohit Devanagari
+  Lohit Devanagari
+
+Lohit Gujarati
+  Lohit Gujarati
+
+Lohit Gurmukhi
+  Lohit Gurmukhi
+
+Lohit Kannada
+  Lohit Kannada
+
+Lohit Malayalam
+  Lohit Malayalam
+
+Lohit Odia
+  Lohit Odia
+
+Lohit Tamil
+  Lohit Tamil
+
+Lohit Tamil Classical
+  Lohit Tamil Classical
+
+Lohit Telugu
+  Lohit Telugu
+
+Loma
+  Loma
+  Loma Bold
+  Loma Bold Oblique
+  Loma Oblique
+
+Mallanna
+  Mallanna
+
+Mandali
+  Mandali
+
+Manjari
+  Manjari
+  Manjari Bold
+  Manjari Thin
+
+Meera
+  Meera
+
+Mitra
+  Mitra Mono
+
+Mukti
+  Mukti
+  Mukti Bold
+
+NATS
+  NATS
+
+NTR
+  NTR
+
+Nakula
+  Nakula
+
+Navilu
+  Navilu
+
+Nimbus Mono PS
+  Nimbus Mono PS Bold
+  Nimbus Mono PS Bold Italic
+  Nimbus Mono PS Italic
+  Nimbus Mono PS Regular
+  NimbusMonoPS-Bold
+  NimbusMonoPS-BoldItalic
+  NimbusMonoPS-Italic
+  NimbusMonoPS-Regular
+
+Nimbus Roman
+  Nimbus Roman Bold
+  Nimbus Roman Bold Italic
+  Nimbus Roman Italic
+  Nimbus Roman Regular
+  NimbusRoman-Bold
+  NimbusRoman-BoldItalic
+  NimbusRoman-Italic
+  NimbusRoman-Regular
+
+Nimbus Sans
+  Nimbus Sans Bold
+  Nimbus Sans Bold Italic
+  Nimbus Sans Italic
+  Nimbus Sans Regular
+  NimbusSans-Bold
+  NimbusSans-BoldItalic
+  NimbusSans-Italic
+  NimbusSans-Regular
+
+Nimbus Sans Narrow
+  Nimbus Sans Narrow Bold
+  Nimbus Sans Narrow Bold Oblique
+  Nimbus Sans Narrow Oblique
+  Nimbus Sans Narrow Regular
+  NimbusSansNarrow-Bold
+  NimbusSansNarrow-BoldOblique
+  NimbusSansNarrow-Oblique
+  NimbusSansNarrow-Regular
+
+Norasi
+  Norasi
+  Norasi Bold
+  Norasi Bold Italic
+  Norasi Bold Oblique
+  Norasi Italic
+  Norasi Oblique
+
+Noto Color Emoji
+  Noto Color Emoji
+
+Noto Mono
+  Noto Mono
+
+Noto Sans CJK HK
+  Noto Sans CJK HK
+  Noto Sans CJK HK Black
+  Noto Sans CJK HK Bold
+  Noto Sans CJK HK DemiLight
+  Noto Sans CJK HK Light
+  Noto Sans CJK HK Medium
+  Noto Sans CJK HK Thin
+
+Noto Sans CJK JP
+  Noto Sans CJK JP
+  Noto Sans CJK JP Black
+  Noto Sans CJK JP Bold
+  Noto Sans CJK JP DemiLight
+  Noto Sans CJK JP Light
+  Noto Sans CJK JP Medium
+  Noto Sans CJK JP Thin
+
+Noto Sans CJK KR
+  Noto Sans CJK KR
+  Noto Sans CJK KR Black
+  Noto Sans CJK KR Bold
+  Noto Sans CJK KR DemiLight
+  Noto Sans CJK KR Light
+  Noto Sans CJK KR Medium
+  Noto Sans CJK KR Thin
+
+Noto Sans CJK SC
+  Noto Sans CJK SC
+  Noto Sans CJK SC Black
+  Noto Sans CJK SC Bold
+  Noto Sans CJK SC DemiLight
+  Noto Sans CJK SC Light
+  Noto Sans CJK SC Medium
+  Noto Sans CJK SC Thin
+
+Noto Sans CJK TC
+  Noto Sans CJK TC
+  Noto Sans CJK TC Black
+  Noto Sans CJK TC Bold
+  Noto Sans CJK TC DemiLight
+  Noto Sans CJK TC Light
+  Noto Sans CJK TC Medium
+  Noto Sans CJK TC Thin
+
+Noto Sans Mono
+  Noto Sans Mono Bold
+  Noto Sans Mono Regular
+
+Noto Sans Mono CJK HK
+  Noto Sans Mono CJK HK
+  Noto Sans Mono CJK HK Bold
+
+Noto Sans Mono CJK JP
+  Noto Sans Mono CJK JP
+  Noto Sans Mono CJK JP Bold
+
+Noto Sans Mono CJK KR
+  Noto Sans Mono CJK KR
+  Noto Sans Mono CJK KR Bold
+
+Noto Sans Mono CJK SC
+  Noto Sans Mono CJK SC
+  Noto Sans Mono CJK SC Bold
+
+Noto Sans Mono CJK TC
+  Noto Sans Mono CJK TC
+  Noto Sans Mono CJK TC Bold
+
+Noto Serif CJK HK
+  Noto Serif CJK HK
+  Noto Serif CJK HK Black
+  Noto Serif CJK HK Bold
+  Noto Serif CJK HK ExtraLight
+  Noto Serif CJK HK Light
+  Noto Serif CJK HK Medium
+  Noto Serif CJK HK SemiBold
+
+Noto Serif CJK JP
+  Noto Serif CJK JP
+  Noto Serif CJK JP Black
+  Noto Serif CJK JP Bold
+  Noto Serif CJK JP ExtraLight
+  Noto Serif CJK JP Light
+  Noto Serif CJK JP Medium
+  Noto Serif CJK JP SemiBold
+
+Noto Serif CJK KR
+  Noto Serif CJK KR
+  Noto Serif CJK KR Black
+  Noto Serif CJK KR Bold
+  Noto Serif CJK KR ExtraLight
+  Noto Serif CJK KR Light
+  Noto Serif CJK KR Medium
+  Noto Serif CJK KR SemiBold
+
+Noto Serif CJK SC
+  Noto Serif CJK SC
+  Noto Serif CJK SC Black
+  Noto Serif CJK SC Bold
+  Noto Serif CJK SC ExtraLight
+  Noto Serif CJK SC Light
+  Noto Serif CJK SC Medium
+  Noto Serif CJK SC SemiBold
+
+Noto Serif CJK TC
+  Noto Serif CJK TC
+  Noto Serif CJK TC Black
+  Noto Serif CJK TC Bold
+  Noto Serif CJK TC ExtraLight
+  Noto Serif CJK TC Light
+  Noto Serif CJK TC Medium
+  Noto Serif CJK TC SemiBold
+
+OpenSymbol
+  OpenSymbol
+
+P052
+  P052 Bold
+  P052 Bold Italic
+  P052 Italic
+  P052 Roman
+  P052-Bold
+  P052-BoldItalic
+  P052-Italic
+  P052-Roman
+
+Padauk
+  Padauk
+  Padauk Bold
+
+Padauk Book
+  Padauk Book
+  Padauk Book Bold
+
+Pagul
+  Pagul
+
+Peddana
+  Peddana Regular
+
+Phetsarath OT
+  Phetsarath OT
+
+Ponnala
+  Ponnala
+
+Pothana2000
+  Pothana2000
+
+Potti Sreeramulu
+  Potti Sreeramulu
+
+Purisa
+  Purisa
+  Purisa Bold
+  Purisa Bold Oblique
+  Purisa Oblique
+
+Rachana
+  Rachana
+  Rachana
+
+RaghuMalayalamSans
+  RaghuMalayalamSans Regular
+
+Ramabhadra
+  Ramabhadra
+
+Ramaraja
+  Ramaraja Regular
+
+Rasa
+  Rasa Bold
+  Rasa Light
+  Rasa Medium
+  Rasa Regular
+  Rasa SemiBold
+
+RaviPrakash
+  RaviPrakash
+
+Rekha
+  Rekha
+
+Saab
+  Saab
+
+Sahadeva
+  Sahadeva
+
+Samanata
+  Samanata
+
+Samyak Devanagari
+  Samyak Devanagari
+
+Samyak Gujarati
+  Samyak Gujarati
+
+Samyak Malayalam
+  Samyak Malayalam
+
+Samyak Tamil
+  Samyak Tamil
+
+Sarai
+  Sarai
+
+Sawasdee
+  Sawasdee
+  Sawasdee Bold
+  Sawasdee Bold Oblique
+  Sawasdee Oblique
+
+Sree Krushnadevaraya
+  Sree Krushnadevaraya
+
+Standard Symbols PS
+  Standard Symbols PS
+  Standard Symbols PS Regular
+
+Suranna
+  Suranna
+
+Suravaram
+  Suravaram
+
+Suruma
+  Suruma
+
+Syamala Ramana
+  Syamala Ramana
+
+TenaliRamakrishna
+  TenaliRamakrishna
+
+Tibetan Machine Uni
+  Tibetan_Machine_Uni
+
+Timmana
+  Timmana
+
+Tlwg Mono
+  Tlwg Mono
+  Tlwg Mono Bold
+  Tlwg Mono Bold Oblique
+  Tlwg Mono Oblique
+
+Tlwg Typewriter
+  Tlwg Typewriter
+  Tlwg Typewriter Bold
+  Tlwg Typewriter Bold Oblique
+  Tlwg Typewriter Oblique
+
+Tlwg Typist
+  Tlwg Typist
+  Tlwg Typist Bold
+  Tlwg Typist Bold Oblique
+  Tlwg Typist Oblique
+
+Tlwg Typo
+  Tlwg Typo
+  Tlwg Typo Bold
+  Tlwg Typo Bold Oblique
+  Tlwg Typo Oblique
+
+URW Bookman
+  URW Bookman Demi
+  URW Bookman Demi Italic
+  URW Bookman Light
+  URW Bookman Light Italic
+  URWBookman-Demi
+  URWBookman-DemiItalic
+  URWBookman-Light
+  URWBookman-LightItalic
+
+URW Gothic
+  URW Gothic Book
+  URW Gothic Book Oblique
+  URW Gothic Demi
+  URW Gothic Demi Oblique
+  URWGothic-Book
+  URWGothic-BookOblique
+  URWGothic-Demi
+  URWGothic-DemiOblique
+
+Ubuntu
+  Ubuntu
+  Ubuntu Bold
+  Ubuntu Bold Italic
+  Ubuntu Italic
+  Ubuntu Light
+  Ubuntu Light Italic
+  Ubuntu Medium
+  Ubuntu Medium Italic
+  Ubuntu Thin
+
+Ubuntu Condensed
+  Ubuntu Condensed
+
+Ubuntu Mono
+  Ubuntu Mono
+  Ubuntu Mono Bold
+  Ubuntu Mono Bold Italic
+  Ubuntu Mono Italic
+
+Umpush
+  Umpush
+  Umpush Bold
+  Umpush Bold Oblique
+  Umpush Light
+  Umpush Light Oblique
+  Umpush Oblique
+
+Uroob
+  Uroob Regular
+
+Vemana2000
+  Vemana2000
+
+Waree
+  Waree
+  Waree Bold
+  Waree Bold Oblique
+  Waree Oblique
+
+Yrsa
+  Yrsa Bold
+  Yrsa Bold Italic
+  Yrsa Italic
+  Yrsa Light
+  Yrsa Light Italic
+  Yrsa Medium
+  Yrsa Medium Italic
+  Yrsa Regular
+  Yrsa SemiBold
+  Yrsa SemiBold Italic
+
+Z003
+  Z003 Medium Italic
+  Z003-MediumItalic
+
+aakar
+  aakar
+
+mry_KacstQurn
+  mry_KacstQurn
+
+ori1Uni
+  ori1Uni Medium
+
+padmaa
+  padmaa
+  padmaa-normal-indictrans
+
+padmaa-Bold.1.1
+  padmaa-Bold.1.1
+
