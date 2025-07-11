@@ -1,16 +1,17 @@
 const std = @import("std");
 const Emoji = @import("emoji.zig").Emoji;
 const Allocator = std.mem.Allocator;
-const Emojis = @import("emoji-slice.zig").Emojis;
+const Emojis = @import("emojis.zig").Emojis;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
 
-    const emojis = Emojis.init(allocator, "input.tsv") catch |err| {
+    const emojis = Emojis.init(allocator) catch |err| {
         std.debug.print("Error initializing Emojis: {}\n", .{err});
         return err;
     };
+    defer emojis.deinit();
 
     for (emojis.emojis) |emoji| {
         std.debug.print("Emoji: {s}\tCategory: {s}\tSubcategory: {s}\tName: {s}\t", 
