@@ -15,7 +15,7 @@ const no_match_score: i16 = -1000;
 
 pub fn fuzzy_search(pattern: []const u8, str: []const u8) i16 {
     if (pattern.len == 0) {
-        return initial_score; // empty pattern matches everything with score 0
+        return initial_score; // empty pattern matches everything
     }
 
     if (pattern.len > str.len) {
