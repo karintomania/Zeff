@@ -4,7 +4,7 @@ const Allocator = std.mem.Allocator;
 const input_str = @embedFile("input.tsv");
 
 pub const Emojis = struct {
-    emojis: []Emoji,
+    emojis: []const Emoji,
     arena: std.heap.ArenaAllocator,
 
     pub fn init(allocator: Allocator) !Emojis {
@@ -23,7 +23,7 @@ pub const Emojis = struct {
     }
 };
 
-fn getEmojiSlice(allocator: Allocator) ![]Emoji {
+fn getEmojiSlice(allocator: Allocator) ![]const Emoji {
     var lines = std.mem.splitSequence(u8, input_str, "\n");
     var emojis_list = std.ArrayList(Emoji).init(allocator);
 

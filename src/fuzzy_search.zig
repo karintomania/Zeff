@@ -1,8 +1,9 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 
-const adjacency_bonus = 15;
-const separator_bonus = 30;
-const first_letter_bonus = 15;
+const adjacency_bonus: i16 = 20;
+const separator_bonus: i16 = 10;
+const first_letter_bonus: i16 = 30;
 
 const leading_letter_penalty: i16 = -5;
 const max_leading_letter_penalty: i16 = -15;
@@ -13,32 +14,53 @@ const initial_score: i16 = 100;
 
 const no_match_score: i16 = -1000;
 
-pub fn fuzzy_search(pattern: []const u8, str: []const u8) i16 {
-    if (pattern.len == 0) {
-        return initial_score; // empty pattern matches everything
+pub fn fuzzy_search(query: []const u8, str: []const u8) !i16 {
+    var buffer: [1024] u8 = undefined;
+    var fba = std.heap.FixedBufferAllocator.init(&buffer);
+    const allocator = fba.allocator();
+
+    const query_lower = try lowerCaseString(query, allocator);
+    defer allocator.free(query_lower);
+    const str_lower = try lowerCaseString(str, allocator);
+    defer allocator.free(str_lower);
+
+    if (query.len == 0) {
+        return initial_score; // empty query matches everything
     }
 
-    if (pattern.len > str.len) {
-        return no_match_score; // pattern longer than string cannot match
+    if (query.len > str.len) {
+        return no_match_score; // query longer than string cannot match
     }
 
-    const score = initial_score + @as(i16, @intCast(str.len - pattern.len)) * unmatched_letter_penalty;
+    const score = initial_score + @as(i16, @intCast(str.len - query.len)) * unmatched_letter_penalty;
 
     // Start the recursive matching with the first character
-    return recursive_match(pattern, str, null, score, true);
+    return recursive_match(query_lower, str_lower, null, score, true);
 }
 
-fn recursive_match(pattern: []const u8, str: []const u8, before_str: ?u8, score: i16, is_first_char: bool) i16 {
-    if (pattern.len == 0) {
+fn lowerCaseString(str: []const u8, allocator: Allocator) ![]const u8 {
+    var lower = std.ArrayList(u8).init(allocator);
+    errdefer lower.deinit();
+
+    for (str) |c| {
+        try lower.append(std.ascii.toLower(c));
+    }
+
+    return lower.toOwnedSlice();
+}
+
+
+fn recursive_match(query: []const u8, str: []const u8, before_str: ?u8, score: i16, is_first_char: bool) i16 {
+    if (query.len == 0) {
         return score;
     }
 
     var best_score: i16 = no_match_score;
 
     for (str, 0..) |c, i| {
-        if (c == pattern[0]) {
+        if (c == query[0]) {
             const new_score = compute_score(@intCast(i), is_first_char, c, if (i > 0) str[i - 1] else before_str);
-            const next_score = recursive_match(pattern[1..], str[i + 1 ..], str[i], new_score, false);
+            const next_score = recursive_match(query[1..], str[i + 1 ..], str[i], new_score, false);
             best_score = @max(best_score, next_score);
         }
     }
@@ -84,52 +106,52 @@ fn compute_score(jump: u8, is_first_char: bool, match: u8, before_match: ?u8) i1
 
 test "recursive_match returns correct score" {
     const TestCase = struct {
-        pattern: []const u8,
+        query: []const u8,
         str: []const u8,
         expected_score: i16,
     };
 
     const cases = [_]TestCase{
         .{
-            // empty pattern matches anything
-            .pattern = "",
+            // empty query matches anything
+            .query = "",
             .str = "hello",
             .expected_score = initial_score,
         },
         .{
             // no match found
-            .pattern = "x",
+            .query = "x",
             .str = "hello",
             .expected_score = no_match_score,
         },
         .{
             // single character match at start
-            .pattern = "h",
+            .query = "h",
             .str = "hello",
             .expected_score = initial_score + 4 * unmatched_letter_penalty + first_letter_bonus,
         },
         .{
             // single character match with jump
-            .pattern = "e",
+            .query = "e",
             .str = "hello",
             .expected_score = initial_score + 4 * unmatched_letter_penalty + leading_letter_penalty,
         },
         .{
-            // multiple character pattern
-            .pattern = "he",
+            // multiple character query
+            .query = "he",
             .str = "hello",
             .expected_score = initial_score + 3 * unmatched_letter_penalty + first_letter_bonus + adjacency_bonus,
         },
         .{
             // multiple character split
-            .pattern = "hl",
+            .query = "hl",
             .str = "hello",
             .expected_score = initial_score + 3 * unmatched_letter_penalty + first_letter_bonus,
         },
     };
 
     for (cases) |test_case| {
-        const score = fuzzy_search(test_case.pattern, test_case.str);
+        const score = try fuzzy_search(test_case.query, test_case.str);
         try std.testing.expectEqual(test_case.expected_score, score);
     }
 }
