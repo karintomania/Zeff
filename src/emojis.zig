@@ -8,7 +8,7 @@ pub const Emojis = struct {
     arena: std.heap.ArenaAllocator,
 
     pub fn init(allocator: Allocator) !Emojis {
-        var arena =  std.heap.ArenaAllocator.init(allocator);
+        var arena = std.heap.ArenaAllocator.init(allocator);
 
         const emojis = try getEmojiSlice(arena.allocator());
 

@@ -38,12 +38,12 @@ pub const Emoji = struct {
         allocator.free(self.category);
         allocator.free(self.subcategory);
         allocator.free(self.name);
-        
-        for(self.keywords) |keyword| {
+
+        for (self.keywords) |keyword| {
             allocator.free(keyword);
         }
 
-        for(self.skin_tones) |skin_tone| {
+        for (self.skin_tones) |skin_tone| {
             allocator.free(skin_tone);
         }
         allocator.free(self.keywords);
@@ -51,8 +51,7 @@ pub const Emoji = struct {
     }
 };
 
-fn splitStringToArrayList(str: []const u8, delimiter: []const u8, allocator: Allocator) !ArrayList([]const u8)
-{
+fn splitStringToArrayList(str: []const u8, delimiter: []const u8, allocator: Allocator) !ArrayList([]const u8) {
     var parts = std.mem.splitSequence(u8, str, delimiter);
 
     var list = ArrayList([]const u8).init(allocator);

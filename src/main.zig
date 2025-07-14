@@ -14,9 +14,7 @@ pub fn main() !void {
     defer emojis.deinit();
 
     for (emojis.emojis) |emoji| {
-        std.debug.print("Emoji: {s}\tCategory: {s}\tSubcategory: {s}\tName: {s}\t", 
-            .{emoji.character, emoji.category, emoji.subcategory, emoji.name});
+        std.debug.print("Emoji: {s}\tCategory: {s}\tSubcategory: {s}\tName: {s}\t", .{ emoji.character, emoji.category, emoji.subcategory, emoji.name });
         std.debug.print("Keywords: {s}\n", .{try std.mem.join(allocator, ", ", emoji.keywords)});
     }
 }
-
