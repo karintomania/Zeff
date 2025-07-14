@@ -15,19 +15,6 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    // This creates a "module", which represents a collection of source files alongside
-    // some compilation options, such as optimization mode and linked system libraries.
-    // Every executable or library we compile will be based on one or more modules.
-    // const lib_mod = b.createModule(.{
-    //     // `root_source_file` is the Zig "entry point" of the module. If a module
-    //     // only contains e.g. external object files, you can make this `null`.
-    //     // In this case the main source file is merely a path, however, in more
-    //     // complicated build scripts, this could be a generated file.
-    //     .root_source_file = b.path("src/root.zig"),
-    //     .target = target,
-    //     .optimize = optimize,
-    // });
-
     // We will also create a module for our other entry point, 'main.zig'.
     const exe_mod = b.createModule(.{
         // `root_source_file` is the Zig "entry point" of the module. If a module
@@ -45,6 +32,12 @@ pub fn build(b: *std.Build) void {
         .name = "zeff",
         .root_module = exe_mod,
     });
+
+
+    // Add libc and ncursesw
+    exe.linkLibC();
+    exe.linkSystemLibrary("ncursesw");
+
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
