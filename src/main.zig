@@ -23,6 +23,8 @@ const hit_number_col: c_int = input_col;
 const result_row: c_int = hit_number_row + 2;
 const result_col: c_int = input_col + input_prefix_len;
 
+const cursor_symbol: []const u8 = ">";
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
@@ -70,13 +72,13 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
         // Clear the screen
         _ = c.clear();
 
-        _ = c.mvprintw(input_row - 2, input_col, "Type keywords (Ctrl+C to quit)");
+        _ = c.mvprintw(input_row - 2, input_col, "Type keywords. (Enter: Select | Ctrl+C: quit)");
         _ = c.mvprintw(input_row, input_col, "🔍:");
 
         if (input_buf.items.len > 0) {
             _ = c.mvprintw(input_row, input_col + input_prefix_len, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
 
-            _ = c.mvprintw(cursor_row, 1, ">");
+            _ = c.mvprintw(cursor_row, result_col - 2, cursor_symbol.ptr);
 
             results = try search(input_buf.items, default_limit, emojis.emojis, allocator);
 
