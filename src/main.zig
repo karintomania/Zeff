@@ -14,8 +14,10 @@ const default_limit = 10;
 
 const input_row: c_int = 2;
 const input_col: c_int = 4;
-const result_row: c_int = 4;
-const result_col: c_int = 4;
+const result_row: c_int = 5;
+const result_col: c_int = input_col;
+const hit_number_row: c_int = 3;
+const hit_number_col: c_int = input_col;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -27,11 +29,22 @@ pub fn main() !void {
     };
     defer emojis.deinit();
 
+    const selected_emoji = try startUI(emojis, allocator);
+
+    if (selected_emoji != null) {
+        const stdow = std.io.getStdOut().writer();
+        try stdow.print("{s}", .{selected_emoji.?.character});
+    }
+}
+
+fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
     // Set locale for UTF-8 support
     _ = c.setlocale(c.LC_ALL, "");
 
     // use newterm instead of initscr(). This enables linux pipe like $ zeff | x-copy
     _ = c.newterm(null, c.stderr, c.stdin);
+
+    defer _ = c.endwin();
 
     // Don't echo typed characters
     _ = c.noecho();
@@ -56,12 +69,12 @@ pub fn main() !void {
         // Clear the screen
         _ = c.clear();
 
-        _ = c.mvprintw(input_row, input_col, ">");
+        _ = c.mvprintw(input_row, input_col, "🔍:");
 
         if (input_buf.items.len > 0) {
-            _ = c.mvprintw(input_row, input_col + 2, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
+            _ = c.mvprintw(input_row, input_col + 4, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
 
-            _ = c.mvprintw(cursor_row, 1, "->");
+            _ = c.mvprintw(cursor_row, 1, ">");
 
             results = try search(input_buf.items, default_limit, emojis.emojis, allocator);
 
@@ -75,7 +88,12 @@ pub fn main() !void {
         } else {
             cursor_row = result_row;
             cursor_max_row = result_row;
+
+            _ = c.mvprintw(input_row, input_col + 4, "Type keywords");
         }
+
+        _ = c.mvprintw(hit_number_row, hit_number_col + 4, "%d", results.len);
+
         _ = c.refresh();
 
         const ch: c_int = c.getch();
@@ -85,7 +103,7 @@ pub fn main() !void {
             if (input_buf.items.len > 0) {
                 _ = input_buf.pop();
             }
-        } else if (isAlphabetic(ch) or ch == ' ') {
+        } else if (isValidCharacter(ch)) {
             try input_buf.append(@as(u8, @intCast(ch)));
         }
 
@@ -104,17 +122,17 @@ pub fn main() !void {
         }
     }
 
-    _ = c.endwin();
-
-    if (results.len > 0) {
-        const selected_index = @as(usize, @intCast(cursor_row - result_row));
-        const selected_emoji = results[selected_index].emoji;
-
-        const stdow = std.io.getStdOut().writer();
-        try stdow.print("{s}", .{selected_emoji.character});
+    if (results.len == 0) {
+        return null; // No results found
     }
+
+    const selected_index = @as(usize, @intCast(cursor_row - result_row));
+    const selected_emoji = results[selected_index].emoji;
+
+    return selected_emoji;
+
 }
 
-fn isAlphabetic(ch: c_int) bool {
-    return (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z');
+fn isValidCharacter(ch: c_int) bool {
+    return (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z') or ch == ' ';
 }
