@@ -27,10 +27,13 @@ pub fn main() !void {
     };
     defer emojis.deinit();
 
+
     // Set locale for UTF-8 support
     _ = c.setlocale(c.LC_ALL, "");
-    
-    _ = c.initscr();
+
+    // use newterm instead of initscr(). This enables linux pipe like $ zeff | x-copy
+    _ = c.newterm(null, c.stderr, c.stdin);
+
 
     // Don't echo typed characters
     _ = c.noecho();
