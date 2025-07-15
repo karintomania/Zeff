@@ -113,7 +113,6 @@ fn getTestEmojisSearch() []const Emoji {
     };
 }
 
-
 test "search keywords" {
     const allocator = std.testing.allocator;
 
@@ -133,7 +132,6 @@ test "search keywords" {
 
     try std.testing.expectEqualSlices(u8, "😃", results[2].emoji.character);
 }
-
 
 fn getTestEmojisKeywords() []const Emoji {
     return &[_]Emoji{
@@ -163,4 +161,3 @@ fn getTestEmojisKeywords() []const Emoji {
         },
     };
 }
-

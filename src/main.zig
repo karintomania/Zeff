@@ -27,13 +27,11 @@ pub fn main() !void {
     };
     defer emojis.deinit();
 
-
     // Set locale for UTF-8 support
     _ = c.setlocale(c.LC_ALL, "");
 
     // use newterm instead of initscr(). This enables linux pipe like $ zeff | x-copy
     _ = c.newterm(null, c.stderr, c.stdin);
-
 
     // Don't echo typed characters
     _ = c.noecho();
@@ -43,7 +41,6 @@ pub fn main() !void {
     _ = c.keypad(c.stdscr, true);
     // Disable cursor visibility
     _ = c.curs_set(0);
-
 
     // buffer for user input
     var input_buf = std.ArrayList(u8).init(allocator);
@@ -116,10 +113,8 @@ pub fn main() !void {
         const stdow = std.io.getStdOut().writer();
         try stdow.print("{s}", .{selected_emoji.character});
     }
-
 }
 
 fn isAlphabetic(ch: c_int) bool {
     return (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z');
 }
-

@@ -33,11 +33,9 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
 
-
     // Add libc and ncursesw
     exe.linkLibC();
     exe.linkSystemLibrary("ncursesw");
-
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

@@ -15,7 +15,7 @@ const initial_score: i16 = 100;
 const no_match_score: i16 = -1000;
 
 pub fn fuzzy_search(query: []const u8, str: []const u8) !i16 {
-    var buffer: [1024] u8 = undefined;
+    var buffer: [1024]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buffer);
     const allocator = fba.allocator();
 
@@ -48,7 +48,6 @@ fn lowerCaseString(str: []const u8, allocator: Allocator) ![]const u8 {
 
     return lower.toOwnedSlice();
 }
-
 
 fn recursive_match(query: []const u8, str: []const u8, before_str: ?u8, score: i16, is_first_char: bool) i16 {
     if (query.len == 0) {
