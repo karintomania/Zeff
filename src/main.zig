@@ -10,7 +10,7 @@ const c = @cImport({
     @cInclude("ncurses.h");
 });
 
-const default_limit = 10;
+const default_limit = 20;
 
 const input_row: c_int = 2;
 const input_col: c_int = 4;
@@ -18,6 +18,8 @@ const result_row: c_int = 5;
 const result_col: c_int = input_col;
 const hit_number_row: c_int = 3;
 const hit_number_col: c_int = input_col;
+const input_prefix: []const u8 = "🔍:";
+const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -46,14 +48,11 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
 
     defer _ = c.endwin();
 
-    // Don't echo typed characters
     _ = c.noecho();
-    // Allow user to quit with Ctrl+C
     _ = c.cbreak();
-    // Enable special keys like arrow keys
     _ = c.keypad(c.stdscr, true);
     // Disable cursor visibility
-    _ = c.curs_set(0);
+    // _ = c.curs_set(0);
 
     // buffer for user input
     var input_buf = std.ArrayList(u8).init(allocator);
@@ -72,7 +71,7 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
         _ = c.mvprintw(input_row, input_col, "🔍:");
 
         if (input_buf.items.len > 0) {
-            _ = c.mvprintw(input_row, input_col + 4, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
+            _ = c.mvprintw(input_row, input_col + input_prefix_len, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
 
             _ = c.mvprintw(cursor_row, 1, ">");
 
@@ -89,10 +88,14 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
             cursor_row = result_row;
             cursor_max_row = result_row;
 
-            _ = c.mvprintw(input_row, input_col + 4, "Type keywords");
+            results = &.{};
+
+            _ = c.mvprintw(input_row, input_col + input_prefix_len, "Type keywords");
         }
 
-        _ = c.mvprintw(hit_number_row, hit_number_col + 4, "%d", results.len);
+        _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "%d", results.len);
+
+        _ = c.move(input_row, input_col + @as(c_int, @intCast(input_buf.items.len)) + input_prefix_len);
 
         _ = c.refresh();
 
