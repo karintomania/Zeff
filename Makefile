@@ -10,4 +10,7 @@ test-watch:
 	zig build -fincremental --watch --debounce 1000 test
 
 format:
-	zig fmt src
+	zig fmt .
+
+install:
+	zig build &&  cp zig-out/bin/zeff ~/.local/bin;

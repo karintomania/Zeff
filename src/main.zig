@@ -13,13 +13,15 @@ const c = @cImport({
 const default_limit = 20;
 
 const input_row: c_int = 2;
-const input_col: c_int = 4;
-const result_row: c_int = 5;
-const result_col: c_int = input_col;
-const hit_number_row: c_int = 3;
-const hit_number_col: c_int = input_col;
+const input_col: c_int = 5;
 const input_prefix: []const u8 = "🔍:";
 const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
+
+const hit_number_row: c_int = 3;
+const hit_number_col: c_int = input_col;
+
+const result_row: c_int = hit_number_row + 2;
+const result_col: c_int = input_col + input_prefix_len;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -68,6 +70,7 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
         // Clear the screen
         _ = c.clear();
 
+        _ = c.mvprintw(input_row - 2, input_col, "Type keywords (Ctrl+C to quit)");
         _ = c.mvprintw(input_row, input_col, "🔍:");
 
         if (input_buf.items.len > 0) {
@@ -90,10 +93,8 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
 
             results = &.{};
 
-            _ = c.mvprintw(input_row, input_col + input_prefix_len, "Type keywords");
         }
-
-        _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "%d", results.len);
+        _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "found %d", results.len);
 
         _ = c.move(input_row, input_col + @as(c_int, @intCast(input_buf.items.len)) + input_prefix_len);
 
