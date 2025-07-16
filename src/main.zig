@@ -33,6 +33,7 @@ pub fn main() !void {
         std.debug.print("Error initializing Emojis: {}\n", .{err});
         return err;
     };
+
     defer emojis.deinit();
 
     const selected_emoji = try startUI(emojis, allocator);
@@ -86,9 +87,13 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
 
             var i: c_int = 0;
             for (results) |result| {
-                _ = c.mvprintw(result_row + i, result_col, "%.*s", @as(c_int, @intCast(result.emoji.character.len)), result.emoji.character.ptr);
+                const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{result.emoji.character, result.label});
+                _ = c.mvprintw(result_row + i, result_col, result_str);
+                allocator.free(result_str);
                 i += 1;
             }
+
+            // allocator.free(results);
         } else {
             cursor_row = result_row;
             cursor_max_row = result_row;
@@ -96,7 +101,7 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
             results = &.{};
 
         }
-        _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "found %d", results.len);
+        _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "Found: %d", results.len);
 
         _ = c.move(input_row, input_col + @as(c_int, @intCast(input_buf.items.len)) + input_prefix_len);
 

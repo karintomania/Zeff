@@ -7,6 +7,8 @@ const name_bonus = 10;
 
 pub const SearchResult = struct {
     emoji: Emoji,
+    // this stores name or keywords whichever got the highest score.
+    label: []const u8, 
     score: i16,
 };
 
@@ -15,10 +17,14 @@ pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Al
     errdefer results.deinit();
 
     for (emojis) |emoji| {
-        const score = getEmojiScore(emoji, query);
+        const best = getEmojiScore(emoji, query);
+        const score = best.score;
+        const label = best.label;
+
         if (score > 0) {
             try results.append(SearchResult{
                 .emoji = emoji,
+                .label = label,
                 .score = score,
             });
         }
@@ -32,7 +38,8 @@ pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Al
     return try results.toOwnedSlice();
 }
 
-fn getEmojiScore(emoji: Emoji, query: []const u8) i16 {
+fn getEmojiScore(emoji: Emoji, query: []const u8) struct {score: i16, label: []const u8} {
+    var label: []const u8 = emoji.name;
     const name_score: i16 = fuzzy_search(query, emoji.name) catch 0;
 
     var best_score: i16 = if (name_score > 0) name_score + name_bonus else 0;
@@ -40,10 +47,13 @@ fn getEmojiScore(emoji: Emoji, query: []const u8) i16 {
     for (emoji.keywords) |keyword| {
         const keyword_score = fuzzy_search(query, keyword) catch 0;
 
-        best_score = @max(best_score, keyword_score);
+        if (best_score < keyword_score) {
+            best_score = keyword_score;
+            label = keyword;
+        }
     }
 
-    return best_score;
+    return .{.score=best_score, .label=label};
 }
 
 fn searchResultLessThan(_: void, lhs: SearchResult, rhs: SearchResult) bool {
@@ -63,6 +73,8 @@ test "search" {
     try std.testing.expectEqual(3, results.len);
 
     try std.testing.expectEqualSlices(u8, "😀", results[0].emoji.character);
+
+    try std.testing.expectEqualSlices(u8, "grinning face", results[0].label);
 
     try std.testing.expectEqualSlices(u8, "😃", results[1].emoji.character);
 
@@ -128,9 +140,18 @@ test "search keywords" {
     // match with emoji name socres higher
     try std.testing.expectEqualSlices(u8, "😀", results[0].emoji.character);
 
+    // name as label
+    try std.testing.expectEqualSlices(u8, "Smile Emoji", results[0].label);
+
     try std.testing.expectEqualSlices(u8, "😄", results[1].emoji.character);
 
+    // keyword as label
+    try std.testing.expectEqualSlices(u8, "smile", results[1].label);
+
     try std.testing.expectEqualSlices(u8, "😃", results[2].emoji.character);
+
+    // keyword as label
+    try std.testing.expectEqualSlices(u8, "smile", results[2].label);
 }
 
 fn getTestEmojisKeywords() []const Emoji {
