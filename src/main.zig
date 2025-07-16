@@ -66,7 +66,7 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
     var cursor_row: c_int = result_row;
 
     var cursor_max_row: c_int = result_row; // the cursor goes result_row + result.len
-    //
+
     var results: []SearchResult = &.{};
 
     while (true) {
@@ -87,7 +87,7 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
 
             var i: c_int = 0;
             for (results) |result| {
-                const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{result.emoji.character, result.label});
+                const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
                 _ = c.mvprintw(result_row + i, result_col, result_str);
                 allocator.free(result_str);
                 i += 1;
@@ -99,7 +99,6 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
             cursor_max_row = result_row;
 
             results = &.{};
-
         }
         _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "Found: %d", results.len);
 
@@ -141,7 +140,6 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
     const selected_emoji = results[selected_index].emoji;
 
     return selected_emoji;
-
 }
 
 fn isValidCharacter(ch: c_int) bool {

@@ -8,7 +8,7 @@ const name_bonus = 10;
 pub const SearchResult = struct {
     emoji: Emoji,
     // this stores name or keywords whichever got the highest score.
-    label: []const u8, 
+    label: []const u8,
     score: i16,
 };
 
@@ -38,7 +38,7 @@ pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Al
     return try results.toOwnedSlice();
 }
 
-fn getEmojiScore(emoji: Emoji, query: []const u8) struct {score: i16, label: []const u8} {
+fn getEmojiScore(emoji: Emoji, query: []const u8) struct { score: i16, label: []const u8 } {
     var label: []const u8 = emoji.name;
     const name_score: i16 = fuzzy_search(query, emoji.name) catch 0;
 
@@ -53,7 +53,7 @@ fn getEmojiScore(emoji: Emoji, query: []const u8) struct {score: i16, label: []c
         }
     }
 
-    return .{.score=best_score, .label=label};
+    return .{ .score = best_score, .label = label };
 }
 
 fn searchResultLessThan(_: void, lhs: SearchResult, rhs: SearchResult) bool {

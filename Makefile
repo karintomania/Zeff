@@ -1,4 +1,4 @@
-.PHONY: build-watch run-watch test-watch format
+.PHONY: build-watch run-watch test-watch format build copy install
 
 build-watch:
 	zig build -fincremental --watch --debounce 1000
@@ -12,5 +12,10 @@ test-watch:
 format:
 	zig fmt .
 
-install:
-	zig build &&  cp zig-out/bin/zeff ~/.local/bin;
+build:
+	zig build -Doptimize=ReleaseSmall
+
+copy:
+	cp zig-out/bin/zeff ~/.local/bin;
+
+install: build copy
