@@ -1,5 +1,5 @@
 const std = @import("std");
-const Emoji = @import("emoji.zig").Emoji;
+const Emoji = @import("../emoji/emoji.zig").Emoji;
 const Allocator = std.mem.Allocator;
 const fuzzy_search = @import("fuzzy_search.zig").fuzzy_search;
 

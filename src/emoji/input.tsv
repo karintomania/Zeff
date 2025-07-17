@@ -871,7 +871,7 @@
 🏠	Travel & Places	place-building	house	house,home,building,dwelling,roof,family	
 🏡	Travel & Places	place-building	house with garden	house with garden,house,garden,home,green,yard	
 🏢	Travel & Places	place-building	office building	office building,office,skyscraper,business,corporate	
-🏣	Travel & Places	place-building	Japanese post office	japanese post office,post office,japan,mail,building	
+🏣	Travel & Places	place-building	Japanese post office	japanese post office,post office,mail,building	
 🏤	Travel & Places	place-building	post office	post office,mail,post,building,stamp	
 🏥	Travel & Places	place-building	hospital	hospital,medical,doctor,nurse,health,building	
 🏦	Travel & Places	place-building	bank	bank,money,finance,building,cash,investment	
@@ -890,7 +890,7 @@
 🕌	Travel & Places	place-religious	mosque	mosque,religion,islam,muslim,building,worship	
 🛕	Travel & Places	place-religious	hindu temple	hindu temple,temple,hinduism,religion,building,worship	
 🕍	Travel & Places	place-religious	synagogue	synagogue,religion,jewish,judaism,building,worship	
-⛩️	Travel & Places	place-religious	shinto shrine	shinto shrine,shinto,japan,religion,torii,worship	
+⛩️	Travel & Places	place-religious	shinto shrine	shinto shrine,shinto,religion,torii,worship	
 🕋	Travel & Places	place-religious	kaaba	kaaba,islam,mecca,mosque,cube,muslim	
 ⛲	Travel & Places	place-other	fountain	fountain,water,park,sculpture,ornament	
 ⛺	Travel & Places	place-other	tent	tent,camping,shelter,outdoors,camp	
@@ -912,7 +912,7 @@
 🚂	Travel & Places	transport-ground	locomotive	locomotive,train,engine,railway,steam,transport	
 🚃	Travel & Places	transport-ground	railway car	railway car,train,carriage,wagon,transport	
 🚄	Travel & Places	transport-ground	high-speed train	high-speed train,train,bullet train,fast,transport	
-🚅	Travel & Places	transport-ground	bullet train	bullet train,shinkansen,japan,train,fast,high-speed	
+🚅	Travel & Places	transport-ground	bullet train	bullet train,shinkansen,train,fast,high-speed	
 🚆	Travel & Places	transport-ground	train	train,railway,locomotive,transport,commute	
 🚇	Travel & Places	transport-ground	metro	metro,subway,underground,train,transport,city	
 🚈	Travel & Places	transport-ground	light rail	light rail,tram,train,transport,city,urban	
@@ -1278,7 +1278,7 @@
 🏷️	Objects	book-paper	label	label,tag,price,name,sticker,identification	
 💰	Objects	money	money bag	money bag,money,cash,dollar,wealth,bag	
 🪙	Objects	money	coin	coin,money,currency,cash,gold,silver	
-💴	Objects	money	yen banknote	yen banknote,yen,money,currency,japan,banknote	
+💴	Objects	money	yen banknote	yen banknote,yen,money,currency,banknote	
 💵	Objects	money	dollar banknote	dollar banknote,dollar,money,currency,usa,banknote	
 💶	Objects	money	euro banknote	euro banknote,euro,money,currency,europe,banknote	
 💷	Objects	money	pound banknote	pound banknote,pound,money,currency,uk,banknote	
@@ -1531,16 +1531,16 @@
 ⚜️	Symbols	other-symbol	fleur-de-lis	fleur-de-lis,flower,lily,french,symbol,royal	
 🔱	Symbols	other-symbol	trident emblem	trident emblem,trident,poseidon,neptune,sea,power	
 📛	Symbols	other-symbol	name badge	name badge,badge,name,identification,tag,id	
-🔰	Symbols	other-symbol	Japanese symbol for beginner	japanese symbol for beginner,beginner,japan,mark,driving,newbie	
+🔰	Symbols	other-symbol	Japanese symbol for beginner	japanese symbol for beginner,beginner,mark,driving,newbie	
 ⭕	Symbols	other-symbol	hollow red circle	hollow red circle,circle,red,zero,o,outline	
-✅	Symbols	other-symbol	check mark button	check mark button,check,yes,correct,done,approved	
+✅	Symbols	other-symbol	check mark button	check mark button,check,yes,correct,done,approved,success	
 ☑️	Symbols	other-symbol	check box with check	check box with check,checkbox,check,select,option,yes	
 ✔️	Symbols	other-symbol	check mark	check mark,check,tick,yes,correct,done	
 ❌	Symbols	other-symbol	cross mark	cross mark,x,no,wrong,cancel,delete	
 ❎	Symbols	other-symbol	cross mark button	cross mark button,x button,cancel,close,delete,button	
 ➰	Symbols	other-symbol	curly loop	curly loop,loop,swirl,curve,line,knot	
 ➿	Symbols	other-symbol	double curly loop	double curly loop,loop,double,swirl,curve,line	
-〽️	Symbols	other-symbol	part alternation mark	part alternation mark,musical,japan,symbol,alternation	
+〽️	Symbols	other-symbol	part alternation mark	part alternation mark,musical,symbol,alternation	
 ✳️	Symbols	other-symbol	eight-spoked asterisk	eight-spoked asterisk,asterisk,star,sparkle,flower	
 ✴️	Symbols	other-symbol	eight-pointed star	eight-pointed star,star,sparkle,light,ornament	
 ❇️	Symbols	other-symbol	sparkle	sparkle,glitter,shine,magic,star,light	
@@ -1583,23 +1583,23 @@
 🆘	Symbols	alphanum	SOS button	sos button,sos,help,emergency,distress,button	
 🆙	Symbols	alphanum	UP! button	up! button,up,rise,increase,button	
 🆚	Symbols	alphanum	VS button	vs button,versus,vs,against,challenge,button	
-🈁	Symbols	alphanum	Japanese “here” button	japanese “here” button,here,japan,katakana,place	
-🈂️	Symbols	alphanum	Japanese “service charge” button	japanese “service charge” button,service charge,japan,katakana,fee	
-🈷️	Symbols	alphanum	Japanese “monthly amount” button	japanese “monthly amount” button,monthly amount,japan,kanji,money	
-🈶	Symbols	alphanum	Japanese “not free of charge” button	japanese “not free of charge” button,not free,japan,kanji,paid	
-🈯	Symbols	alphanum	Japanese “reserved” button	japanese “reserved” button,reserved,japan,kanji,booking	
-🉐	Symbols	alphanum	Japanese “bargain” button	japanese “bargain” button,bargain,japan,kanji,deal,discount	
-🈹	Symbols	alphanum	Japanese “discount” button	japanese “discount” button,discount,japan,kanji,sale	
-🈚	Symbols	alphanum	Japanese “free of charge” button	japanese “free of charge” button,free of charge,japan,kanji,free	
-🈲	Symbols	alphanum	Japanese “prohibited” button	japanese “prohibited” button,prohibited,forbidden,japan,kanji	
-🉑	Symbols	alphanum	Japanese “acceptable” button	japanese “acceptable” button,acceptable,ok,japan,kanji	
-🈸	Symbols	alphanum	Japanese “application” button	japanese “application” button,application,request,japan,kanji	
-🈴	Symbols	alphanum	Japanese “passing grade” button	japanese “passing grade” button,passing grade,pass,exam,japan,kanji	
-🈳	Symbols	alphanum	Japanese “vacancy” button	japanese “vacancy” button,vacancy,empty,available,japan,kanji	
-㊗️	Symbols	alphanum	Japanese “congratulations” button	japanese “congratulations” button,congratulations,celebrate,japan,kanji	
-㊙️	Symbols	alphanum	Japanese “secret” button	japanese “secret” button,secret,confidential,japan,kanji	
-🈺	Symbols	alphanum	Japanese “open for business” button	japanese “open for business” button,open for business,open,japan,kanji	
-🈵	Symbols	alphanum	Japanese “no vacancy” button	japanese “no vacancy” button,no vacancy,full,occupied,japan,kanji	
+🈁	Symbols	alphanum	Japanese “here” button	japanese “here” button,here,katakana,place	
+🈂️	Symbols	alphanum	Japanese “service charge” button	japanese “service charge” button,service charge,katakana,fee	
+🈷️	Symbols	alphanum	Japanese “monthly amount” button	japanese “monthly amount” button,monthly amount,kanji,money	
+🈶	Symbols	alphanum	Japanese “not free of charge” button	japanese “not free of charge” button,not free,kanji,paid	
+🈯	Symbols	alphanum	Japanese “reserved” button	japanese “reserved” button,reserved,kanji,booking	
+🉐	Symbols	alphanum	Japanese “bargain” button	japanese “bargain” button,bargain,kanji,deal,discount	
+🈹	Symbols	alphanum	Japanese “discount” button	japanese “discount” button,discount,kanji,sale	
+🈚	Symbols	alphanum	Japanese “free of charge” button	japanese “free of charge” button,free of charge,kanji,free	
+🈲	Symbols	alphanum	Japanese “prohibited” button	japanese “prohibited” button,prohibited,forbidden,kanji	
+🉑	Symbols	alphanum	Japanese “acceptable” button	japanese “acceptable” button,acceptable,ok,kanji	
+🈸	Symbols	alphanum	Japanese “application” button	japanese “application” button,application,request,kanji	
+🈴	Symbols	alphanum	Japanese “passing grade” button	japanese “passing grade” button,passing grade,pass,exam,kanji	
+🈳	Symbols	alphanum	Japanese “vacancy” button	japanese “vacancy” button,vacancy,empty,available,kanji	
+㊗️	Symbols	alphanum	Japanese “congratulations” button	japanese “congratulations” button,congratulations,celebrate,kanji	
+㊙️	Symbols	alphanum	Japanese “secret” button	japanese “secret” button,secret,confidential,kanji	
+🈺	Symbols	alphanum	Japanese “open for business” button	japanese “open for business” button,open for business,open,kanji	
+🈵	Symbols	alphanum	Japanese “no vacancy” button	japanese “no vacancy” button,no vacancy,full,occupied,kanji	
 🔴	Symbols	geometric	red circle	red circle,circle,red,dot,round	
 🟠	Symbols	geometric	orange circle	orange circle,circle,orange,dot,round	
 🟡	Symbols	geometric	yellow circle	yellow circle,circle,yellow,dot,round	
