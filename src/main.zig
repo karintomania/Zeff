@@ -10,18 +10,12 @@ const c = @cImport({
     @cInclude("ncurses.h");
 });
 
-const default_limit = 20;
+const result_row_offset=1;
+const visible_result = 10;
+const default_limit = 100;
 
-const input_row: c_int = 2;
-const input_col: c_int = 5;
 const input_prefix: []const u8 = " >";
 const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
-
-const hit_number_row: c_int = 3;
-const hit_number_col: c_int = input_col;
-
-const result_row: c_int = hit_number_row + 2;
-const result_col: c_int = input_col + input_prefix_len;
 
 const cursor_symbol: []const u8 = ">";
 
@@ -36,7 +30,7 @@ pub fn main() !void {
 
     defer emojis.deinit();
 
-    const selected_emoji = try startUI(emojis, allocator);
+    const selected_emoji = try startUI(&emojis, allocator);
 
     if (selected_emoji != null) {
         const stdow = std.io.getStdOut().writer();
@@ -44,7 +38,7 @@ pub fn main() !void {
     }
 }
 
-fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
+fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     // Set locale for UTF-8 support
     _ = c.setlocale(c.LC_ALL, "");
 
@@ -60,12 +54,12 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
     var input_buf = std.ArrayList(u8).init(allocator);
     defer input_buf.deinit();
 
-    var cursor_row: c_int = result_row;
-
-    var cursor_max_row: c_int = result_row; // the cursor goes result_row + result.len
+    var cursor_index: c_int = 0;
+    var cursor_max_index: c_int = 0; // the cursor goes result_row + result.len
+    var top_result_index: u16 = 0; // The index of the top visible result
+    var has_query_changed = false;
 
     var results: []SearchResult = &.{};
-    var require_free_results = false;
 
     const win_input = c.newwin(3, 40, 1, 0);
     _ = c.keypad(win_input, true);
@@ -74,7 +68,7 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
     _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
     _ = c.wrefresh(win_instruction);
 
-    const win_result = c.newwin(22, 50, 6, 0);
+    const win_result = c.newwin(visible_result + 3, 50, 6, 0);
 
     while (true) {
         _ = c.wclear(win_input);
@@ -88,33 +82,48 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
         if (input_buf.items.len > 0) {
             _ = c.mvwprintw(win_input, 1, 4, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
 
-            results = try search(input_buf.items, default_limit, emojis.emojis, allocator);
-            require_free_results = true;
-
-            cursor_max_row = 2 + @as(c_int, @intCast(results.len)) - 1;
-
-            // print results
-            var i: c_int = 0;
-            for (results) |result| {
-                const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
-                _ = c.mvwprintw(win_result, 1 + i, 2, result_str);
-                allocator.free(result_str);
-
-                if (i == cursor_row) {
-                    _ = c.mvwprintw(win_result, cursor_row, 1, cursor_symbol.ptr);
-                }
-
-                i += 1;
+            // TODO: When scrolling, no need to run search again
+            if (has_query_changed) {
+                results = try search(input_buf.items, default_limit, emojis.emojis, allocator);
             }
 
+            if (results.len > 0) {
+                cursor_max_index = @min(@as(c_int, @intCast(results.len - 1)), visible_result-1);
+                cursor_index = @min(cursor_index, cursor_max_index);
+                _ = c.mvwprintw(win_result, cursor_index + result_row_offset, 1, cursor_symbol.ptr);
+                top_result_index = @min(results.len-1, top_result_index);
+            }else {
+                cursor_max_index = 0;
+                cursor_index = 0;
+            }
+
+
+            for (results, 0..) |result, result_idx| {
+                if (result_idx < top_result_index) {
+                    continue; // Skip results above the top index
+                }
+
+                // i is the position in result list
+                const i = result_idx - top_result_index;
+
+
+                const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
+
+                _ = c.mvwprintw(win_result, @as(c_int, @intCast(i)) + result_row_offset, 2, result_str);
+                allocator.free(result_str);
+
+                if (i >= visible_result - 1 or i >= results.len - 1) {
+                    break; // Limit to visible results
+                }
+
+            }
         } else {
-            cursor_row = 1;
-            cursor_max_row = 1;
+            cursor_index = 0;
+            cursor_max_index = 0;
 
             results = &.{};
         }
-        _ = c.mvwprintw(win_result, 0, 0, "Result: %d ", results.len);
-
+        _ = c.mvwprintw(win_result, 0, 0, "Result: %d", results.len);
 
         _ = c.wrefresh(win_input);
         _ = c.wrefresh(win_result);
@@ -124,39 +133,51 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
         const ch: c_int = c.wgetch(win_input);
 
         if (ch == c.KEY_BACKSPACE or ch == 127 or ch == 8) {
+            has_query_changed = true;
             // Handle backspace, delete
             if (input_buf.items.len > 0) {
                 _ = input_buf.pop();
             }
+
+            allocator.free(results);
+            continue;
         } else if (isValidCharacter(ch)) {
+            has_query_changed = true;
+
             try input_buf.append(@as(u8, @intCast(ch)));
+
+            allocator.free(results);
+            continue;
         }
 
         if (ch == c.KEY_UP) {
             // Move cursor up
-            if (cursor_row > result_row) {
-                cursor_row -= 1;
+            if (cursor_index > 0) {
+                cursor_index -= 1;
+            } else if (cursor_index == 0 and top_result_index > 0) {
+                top_result_index = top_result_index - 1;
             }
         } else if (ch == c.KEY_DOWN) {
-            // Move cursor down
-            if (cursor_row < cursor_max_row) {
-                cursor_row += 1;
+            if (cursor_index == cursor_max_index 
+                and (cursor_index + top_result_index) <  (results.len - 1) ) {
+                top_result_index += 1;
+            }
+
+            if (cursor_index < cursor_max_index) {
+                cursor_index += 1;
             }
         } else if (ch == 10 or ch == 13) {
             break;
         }
 
-        if (require_free_results) {
-            allocator.free(results);
-            require_free_results = false;
-        }
+        has_query_changed = false;
     }
 
     if (results.len == 0) {
         return null; // No results found
     }
 
-    const selected_index = @as(usize, @intCast(cursor_row - 1));
+    const selected_index = @as(usize, @intCast(cursor_index)) + top_result_index;
     const selected_emoji = results[selected_index].emoji;
 
     return selected_emoji;

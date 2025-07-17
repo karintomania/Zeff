@@ -6,7 +6,7 @@ const fuzzy_search = @import("fuzzy_search.zig").fuzzy_search;
 const name_bonus = 10;
 
 pub const SearchResult = struct {
-    emoji: Emoji,
+    emoji: *const Emoji,
     // this stores name or keywords whichever got the highest score.
     label: []const u8,
     score: i16,
@@ -16,8 +16,8 @@ pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Al
     var results = std.ArrayList(SearchResult).init(allocator);
     errdefer results.deinit();
 
-    for (emojis) |emoji| {
-        const best = getEmojiScore(emoji, query);
+    for (emojis) |*emoji| {
+        const best = getEmojiScore(emoji.*, query);
         const score = best.score;
         const label = best.label;
 
