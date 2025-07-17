@@ -14,7 +14,7 @@ const default_limit = 20;
 
 const input_row: c_int = 2;
 const input_col: c_int = 5;
-const input_prefix: []const u8 = "🔍:";
+const input_prefix: []const u8 = " >";
 const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
 const hit_number_row: c_int = 3;
@@ -55,9 +55,6 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
 
     _ = c.noecho();
     _ = c.cbreak();
-    _ = c.keypad(c.stdscr, true);
-    // Disable cursor visibility
-    // _ = c.curs_set(0);
 
     // buffer for user input
     var input_buf = std.ArrayList(u8).init(allocator);
@@ -68,45 +65,63 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
     var cursor_max_row: c_int = result_row; // the cursor goes result_row + result.len
 
     var results: []SearchResult = &.{};
+    var require_free_results = false;
+
+    const win_input = c.newwin(3, 40, 1, 0);
+    _ = c.keypad(win_input, true);
+
+    const win_instruction = c.newwin(1, 50, 4, 0);
+    _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
+    _ = c.wrefresh(win_instruction);
+
+    const win_result = c.newwin(22, 50, 6, 0);
 
     while (true) {
-        // Clear the screen
-        _ = c.clear();
+        _ = c.wclear(win_input);
+        _ = c.wclear(win_result);
 
-        _ = c.mvprintw(input_row - 2, input_col, "Type keywords. (Enter: Select | Ctrl+C: quit)");
-        _ = c.mvprintw(input_row, input_col, "🔍:");
+        _ = c.box(win_input, 0, 0);
+
+        _ = c.mvwprintw(win_input, 0, 2, "Type keywords 🔍 ");
+        _ = c.mvwprintw(win_input, 1, 2, ">");
 
         if (input_buf.items.len > 0) {
-            _ = c.mvprintw(input_row, input_col + input_prefix_len, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
-
-            _ = c.mvprintw(cursor_row, result_col - 2, cursor_symbol.ptr);
+            _ = c.mvwprintw(win_input, 1, 4, "%.*s", @as(c_int, @intCast(input_buf.items.len)), input_buf.items.ptr);
 
             results = try search(input_buf.items, default_limit, emojis.emojis, allocator);
+            require_free_results = true;
 
-            cursor_max_row = result_row + @as(c_int, @intCast(results.len)) - 1;
+            cursor_max_row = 2 + @as(c_int, @intCast(results.len)) - 1;
 
+            // print results
             var i: c_int = 0;
             for (results) |result| {
                 const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
-                _ = c.mvprintw(result_row + i, result_col, result_str);
+                _ = c.mvwprintw(win_result, 1 + i, 2, result_str);
                 allocator.free(result_str);
+
+                if (i == cursor_row) {
+                    _ = c.mvwprintw(win_result, cursor_row, 1, cursor_symbol.ptr);
+                }
+
                 i += 1;
             }
 
-            // allocator.free(results);
         } else {
-            cursor_row = result_row;
-            cursor_max_row = result_row;
+            cursor_row = 1;
+            cursor_max_row = 1;
 
             results = &.{};
         }
-        _ = c.mvprintw(hit_number_row, hit_number_col + input_prefix_len, "Found: %d", results.len);
+        _ = c.mvwprintw(win_result, 0, 0, "Result: %d ", results.len);
 
-        _ = c.move(input_row, input_col + @as(c_int, @intCast(input_buf.items.len)) + input_prefix_len);
 
-        _ = c.refresh();
+        _ = c.wrefresh(win_input);
+        _ = c.wrefresh(win_result);
 
-        const ch: c_int = c.getch();
+        _ = c.wmove(win_input, 1, 2 + @as(c_int, @intCast(input_buf.items.len)) + input_prefix_len);
+
+        const ch: c_int = c.wgetch(win_input);
 
         if (ch == c.KEY_BACKSPACE or ch == 127 or ch == 8) {
             // Handle backspace, delete
@@ -130,13 +145,18 @@ fn startUI(emojis: Emojis, allocator: Allocator) !?Emoji {
         } else if (ch == 10 or ch == 13) {
             break;
         }
+
+        if (require_free_results) {
+            allocator.free(results);
+            require_free_results = false;
+        }
     }
 
     if (results.len == 0) {
         return null; // No results found
     }
 
-    const selected_index = @as(usize, @intCast(cursor_row - result_row));
+    const selected_index = @as(usize, @intCast(cursor_row - 1));
     const selected_emoji = results[selected_index].emoji;
 
     return selected_emoji;
