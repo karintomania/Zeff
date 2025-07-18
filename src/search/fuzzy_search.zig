@@ -1,3 +1,6 @@
+// This file has fuzzy_search function to score how much the "match" is
+// The implementation is heavily inspired by https://github.com/philj56/fuzzy-match
+
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
