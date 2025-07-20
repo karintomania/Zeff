@@ -43,23 +43,35 @@ const winResult = struct {
     }
 
     pub fn updateQuery(self: *winResult, query: []const u8, allocator: Allocator) !void {
-        _ = c.wclear(self.win);
+        // reset the top_result_idx with query update
+        self.top_result_idx = 0;
 
-        self.results = try search(query, default_limit, self.emojis.emojis, allocator);
+        if (query.len > 0) {
+            self.results = try search(query, default_limit, self.emojis.emojis, allocator);
+        } else {
+            // TODO: show history if the query is empty
+            self.cursor_idx = 0;
+            self.cursor_max_idx = 0;
+            self.results = &.{};
+        }
 
         if (self.results.len > 0) {
             self.cursor_max_idx = @min(@as(c_int, @intCast(self.results.len - 1)), visible_result - 1);
+
             self.cursor_idx = @min(self.cursor_idx, self.cursor_max_idx);
-            _ = c.mvwprintw(self.win, self.cursor_idx + result_row_offset, 1, cursor_symbol.ptr);
-            self.top_result_idx = @min(self.results.len - 1, self.top_result_idx);
         } else {
             self.cursor_max_idx = 0;
             self.cursor_idx = 0;
         }
+    }
 
+    pub fn draw(self: *winResult, allocator: Allocator) !void {
+        _ = c.wclear(self.win);
+
+        // print result
         for (self.results, 0..) |result, result_idx| {
             if (result_idx < self.top_result_idx) {
-                continue; // Skip self.results above the top idx
+                continue; // Skip self.results before the top idx
             }
 
             // i is the position in result list
@@ -75,15 +87,15 @@ const winResult = struct {
             }
         }
 
+        if (self.results.len > 0) {
+            // print selection cursor
+            _ = c.mvwprintw(self.win, self.cursor_idx + result_row_offset, 1, cursor_symbol.ptr);
+        }
+
+        // print result number
         _ = c.mvwprintw(self.win, 0, 0, "Result: %d", self.results.len);
 
         _ = c.wrefresh(self.win);
-    }
-
-    pub fn noInput(self: *winResult) void {
-        self.cursor_idx = 0;
-        self.cursor_max_idx = 0;
-        self.results = &.{};
     }
 
     pub fn moveCursorUp(self: *winResult) void {
@@ -96,11 +108,14 @@ const winResult = struct {
     }
 
     pub fn moveCursorDown(self: *winResult) void {
-        if (self.cursor_idx == self.cursor_max_idx) {
-            self.top_result_idx += 1;
+        if (self.results.len == 0 or self.cursor_idx >= self.results.len - 1) {
+            return;
         }
 
-        if (self.cursor_idx < self.cursor_max_idx) {
+        if (self.cursor_idx == self.cursor_max_idx) {
+            // scroll the resslt
+            self.top_result_idx += 1;
+        } else if (self.cursor_idx < self.cursor_max_idx) {
             self.cursor_idx += 1;
         }
     }
@@ -132,7 +147,7 @@ const winInput = struct {
         };
     }
 
-    pub fn update(self: *winInput) void {
+    pub fn draw(self: *winInput) void {
         _ = c.wclear(self.win);
 
         _ = c.box(self.win, 0, 0);
@@ -154,6 +169,7 @@ const winInput = struct {
 
         // move input cursor to next letter
         const input_cursor_pos: c_int = input_row_offset + @as(c_int, @intCast(self.input_buf.items.len)) + input_prefix_len;
+
         _ = c.wmove(self.win, 1, input_cursor_pos);
 
         _ = c.wrefresh(self.win);
@@ -194,8 +210,6 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     _ = c.noecho();
     _ = c.cbreak();
 
-    var has_query_changed = false;
-
     const win_instruction = c.newwin(1, 50, 4, 0);
     _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
     _ = c.wrefresh(win_instruction);
@@ -207,39 +221,34 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     defer win_input.deinit();
 
     while (true) {
-        if (win_input.input_buf.items.len > 0) {
-            try win_result.updateQuery(win_input.input_buf.items, allocator);
-        } else {
-            win_result.noInput();
-        }
+        // Draw
+        try win_result.draw(allocator);
+        win_input.draw();
 
-        win_input.update();
-
+        // Read and Process Ch
         const ch: c_int = win_input.readCh();
 
         if (ch == c.KEY_BACKSPACE or ch == 127 or ch == 8) {
-            has_query_changed = true;
             win_input.deleteLastInputBuf();
 
-            continue;
+            try win_result.updateQuery(win_input.input_buf.items, allocator);
         } else if (isValidCharacter(ch)) {
-            has_query_changed = true;
-
             try win_input.appendInputBuf(ch);
 
-            continue;
+            try win_result.updateQuery(win_input.input_buf.items, allocator);
         }
 
+        // Move cursor
         if (ch == c.KEY_UP) {
-            // Move cursor up
             win_result.moveCursorUp();
         } else if (ch == c.KEY_DOWN) {
             win_result.moveCursorDown();
-        } else if (ch == 10 or ch == 13) {
-            break;
         }
 
-        has_query_changed = false;
+        // handle Enter
+        if (ch == 10 or ch == 13) {
+            break;
+        }
     }
 
     const selected_emoji = win_result.getSelectedEmoji();
@@ -248,5 +257,8 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
 }
 
 fn isValidCharacter(ch: c_int) bool {
-    return (ch >= '0' and ch <= '9') or (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z') or ch == ' ';
+    return (ch >= '0' and ch <= '9') 
+    or (ch >= 'a' and ch <= 'z') 
+    or (ch >= 'A' and ch <= 'Z') 
+    or ch == ' ';
 }
