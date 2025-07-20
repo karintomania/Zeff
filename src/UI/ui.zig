@@ -30,7 +30,7 @@ const winResult = struct {
     emojis: *const Emojis,
 
     pub fn init(emojis: *const Emojis) winResult {
-        const win = c.newwin(visible_result + 3, 50, 6, 0).?;
+        const win = c.newwin(visible_result + 3, 60, 6, 0).?;
 
         return winResult{
             .win = win,
@@ -112,7 +112,7 @@ const winResult = struct {
             return;
         }
 
-        if (self.cursor_idx == self.cursor_max_idx) {
+        if (self.cursor_idx == self.cursor_max_idx and self.results.len - 1 > (self.top_result_idx + @as(usize, @intCast(self.cursor_idx)))) {
             // scroll the resslt
             self.top_result_idx += 1;
         } else if (self.cursor_idx < self.cursor_max_idx) {
@@ -257,8 +257,5 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
 }
 
 fn isValidCharacter(ch: c_int) bool {
-    return (ch >= '0' and ch <= '9') 
-    or (ch >= 'a' and ch <= 'z') 
-    or (ch >= 'A' and ch <= 'Z') 
-    or ch == ' ';
+    return (ch >= '0' and ch <= '9') or (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z') or ch == ' ';
 }
