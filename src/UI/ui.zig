@@ -87,22 +87,22 @@ const winResult = struct {
     }
 
     pub fn moveCursorUp(self: *winResult) void {
-            // Move cursor up
-            if (self.cursor_idx > 0) {
-                self.cursor_idx -= 1;
-            } else if (self.cursor_idx == 0 and self.top_result_idx > 0) {
-                self.top_result_idx = self.top_result_idx - 1;
-            }
+        // Move cursor up
+        if (self.cursor_idx > 0) {
+            self.cursor_idx -= 1;
+        } else if (self.cursor_idx == 0 and self.top_result_idx > 0) {
+            self.top_result_idx = self.top_result_idx - 1;
+        }
     }
 
     pub fn moveCursorDown(self: *winResult) void {
-            if (self.cursor_idx == self.cursor_max_idx) {
-                self.top_result_idx += 1;
-            }
+        if (self.cursor_idx == self.cursor_max_idx) {
+            self.top_result_idx += 1;
+        }
 
-            if (self.cursor_idx < self.cursor_max_idx) {
-                self.cursor_idx += 1;
-            }
+        if (self.cursor_idx < self.cursor_max_idx) {
+            self.cursor_idx += 1;
+        }
     }
 
     pub fn getSelectedEmoji(self: *winResult) ?*const Emoji {
@@ -140,13 +140,15 @@ const winInput = struct {
         _ = c.mvwprintw(self.win, 0, input_row_offset + 1, "Type keywords 🔍 ");
         _ = c.mvwprintw(self.win, 1, input_row_offset, input_prefix.ptr);
 
-        std.debug.print("length {d}", .{self.input_buf.items.len});
-
+        // print input_buf
         if (self.input_buf.items.len > 0) {
             _ = c.mvwprintw(
-                self.win, 1, input_row_offset + input_prefix_len,
+                self.win,
+                1,
+                input_row_offset + input_prefix_len,
                 "%.*s",
-                @as(c_int, @intCast(self.input_buf.items.len)), self.input_buf.items.ptr,
+                @as(c_int, @intCast(self.input_buf.items.len)),
+                self.input_buf.items.ptr,
             );
         }
 
@@ -162,19 +164,18 @@ const winInput = struct {
         return ch;
     }
 
-    pub fn addCh(self: *winInput, ch: c_int) !void {
+    pub fn appendInputBuf(self: *winInput, ch: c_int) !void {
         if (self.input_buf.items.len < input_limit) {
             try self.input_buf.append(@as(u8, @intCast(ch)));
         }
     }
 
-    pub fn deleteCh(self: *winInput) void {
-            // Handle backspace, delete
-            if (self.input_buf.items.len > 0) {
-                _ = self.input_buf.pop();
-            }
+    pub fn deleteLastInputBuf(self: *winInput) void {
+        // Handle backspace, delete
+        if (self.input_buf.items.len > 0) {
+            _ = self.input_buf.pop();
+        }
     }
-
 
     pub fn deinit(self: *winInput) void {
         self.input_buf.deinit();
@@ -206,8 +207,6 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     defer win_input.deinit();
 
     while (true) {
-
-
         if (win_input.input_buf.items.len > 0) {
             try win_result.updateQuery(win_input.input_buf.items, allocator);
         } else {
@@ -220,13 +219,13 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
 
         if (ch == c.KEY_BACKSPACE or ch == 127 or ch == 8) {
             has_query_changed = true;
-            win_input.deleteCh();
+            win_input.deleteLastInputBuf();
 
             continue;
         } else if (isValidCharacter(ch)) {
             has_query_changed = true;
 
-            try win_input.addCh(ch);
+            try win_input.appendInputBuf(ch);
 
             continue;
         }
