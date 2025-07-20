@@ -19,7 +19,11 @@ const input_limit = 30;
 const input_prefix: []const u8 = " > ";
 const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
-const cursor_symbol: []const u8 = ">";
+const cursor_symbol: []const u8 = "> ";
+
+const color_cyan: c_short = 1;
+const color_blue: c_short = 2;
+const color_green: c_short = 3;
 
 const winResult = struct {
     win: *c.WINDOW,
@@ -43,6 +47,8 @@ const winResult = struct {
     }
 
     pub fn updateQuery(self: *winResult, query: []const u8, allocator: Allocator) !void {
+        allocator.free(self.results);
+
         // reset the top_result_idx with query update
         self.top_result_idx = 0;
 
@@ -68,6 +74,11 @@ const winResult = struct {
     pub fn draw(self: *winResult, allocator: Allocator) !void {
         _ = c.wclear(self.win);
 
+        // print result number
+        _ = c.wattron(self.win, c.COLOR_PAIR(color_green));
+        _ = c.mvwprintw(self.win, 0, 0, "Result: %d", self.results.len);
+        _ = c.wattroff(self.win, c.COLOR_PAIR(color_green));
+
         // print result
         for (self.results, 0..) |result, result_idx| {
             if (result_idx < self.top_result_idx) {
@@ -77,9 +88,18 @@ const winResult = struct {
             // i is the position in result list
             const i = result_idx - self.top_result_idx;
 
+
             const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
 
             _ = c.mvwprintw(self.win, @as(c_int, @intCast(i)) + result_row_offset, 2, result_str);
+            if (i == self.cursor_idx) {
+                // print selection cursor
+                _ = c.mvwprintw(self.win, @as(c_int, @intCast(i)) + result_row_offset, 0, cursor_symbol.ptr);
+
+                // make the line bold and green
+                _ = c.mvwchgat(self.win, @as(c_int, @intCast(i)) + result_row_offset, 1, -1, c.A_BOLD, color_blue, null);
+            }
+
             allocator.free(result_str);
 
             if (i >= visible_result - 1 or i >= self.results.len - 1) {
@@ -87,13 +107,6 @@ const winResult = struct {
             }
         }
 
-        if (self.results.len > 0) {
-            // print selection cursor
-            _ = c.mvwprintw(self.win, self.cursor_idx + result_row_offset, 1, cursor_symbol.ptr);
-        }
-
-        // print result number
-        _ = c.mvwprintw(self.win, 0, 0, "Result: %d", self.results.len);
 
         _ = c.wrefresh(self.win);
     }
@@ -150,10 +163,14 @@ const winInput = struct {
     pub fn draw(self: *winInput) void {
         _ = c.wclear(self.win);
 
+        _ = c.wattron(self.win, c.COLOR_PAIR(color_cyan));
         _ = c.box(self.win, 0, 0);
 
         _ = c.mvwprintw(self.win, 0, input_row_offset + 1, "Type keywords 🔍 ");
+
         _ = c.mvwprintw(self.win, 1, input_row_offset, input_prefix.ptr);
+
+        _ = c.wattroff(self.win, c.COLOR_PAIR(color_cyan));
 
         // print input_buf
         if (self.input_buf.items.len > 0) {
@@ -198,6 +215,15 @@ const winInput = struct {
     }
 };
 
+fn drawWinInstruction() void {
+    const win_instruction = c.newwin(1, 50, 4, 0);
+
+    _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
+
+    _ = c.wrefresh(win_instruction);
+
+}
+
 pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     // Set locale for UTF-8 support
     _ = c.setlocale(c.LC_ALL, "");
@@ -210,9 +236,12 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     _ = c.noecho();
     _ = c.cbreak();
 
-    const win_instruction = c.newwin(1, 50, 4, 0);
-    _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
-    _ = c.wrefresh(win_instruction);
+    _ = c.start_color();
+    _ = c.use_default_colors();
+
+    initColors();
+
+    drawWinInstruction();
 
     var win_result = winResult.init(emojis);
 
@@ -254,6 +283,12 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     const selected_emoji = win_result.getSelectedEmoji();
 
     return selected_emoji;
+}
+
+fn initColors() void {
+    _ = c.init_pair(color_cyan, c.COLOR_CYAN, -1);
+    _ = c.init_pair(color_blue, c.COLOR_BLUE, -1);
+    _ = c.init_pair(color_green, c.COLOR_GREEN, -1);
 }
 
 fn isValidCharacter(ch: c_int) bool {
