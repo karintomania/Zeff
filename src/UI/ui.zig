@@ -14,6 +14,8 @@ const result_row_offset = 1;
 const visible_result = 10;
 const default_limit = 100;
 
+const input_row_offset = 1;
+const input_limit = 30;
 const input_prefix: []const u8 = " > ";
 const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
@@ -135,19 +137,21 @@ const winInput = struct {
 
         _ = c.box(self.win, 0, 0);
 
-        _ = c.mvwprintw(self.win, 0, 2, "Type keywords 🔍 ");
-        _ = c.mvwprintw(self.win, 1, 1, input_prefix.ptr);
+        _ = c.mvwprintw(self.win, 0, input_row_offset + 1, "Type keywords 🔍 ");
+        _ = c.mvwprintw(self.win, 1, input_row_offset, input_prefix.ptr);
 
         std.debug.print("length {d}", .{self.input_buf.items.len});
-        const input_cursor_pos: c_int = 1 + @as(c_int, @intCast(self.input_buf.items.len)) + input_prefix_len;
 
         if (self.input_buf.items.len > 0) {
             _ = c.mvwprintw(
-                self.win, 1, 4,
+                self.win, 1, input_row_offset + input_prefix_len,
                 "%.*s",
                 @as(c_int, @intCast(self.input_buf.items.len)), self.input_buf.items.ptr,
             );
         }
+
+        // move input cursor to next letter
+        const input_cursor_pos: c_int = input_row_offset + @as(c_int, @intCast(self.input_buf.items.len)) + input_prefix_len;
         _ = c.wmove(self.win, 1, input_cursor_pos);
 
         _ = c.wrefresh(self.win);
@@ -159,7 +163,9 @@ const winInput = struct {
     }
 
     pub fn addCh(self: *winInput, ch: c_int) !void {
-        try self.input_buf.append(@as(u8, @intCast(ch)));
+        if (self.input_buf.items.len < input_limit) {
+            try self.input_buf.append(@as(u8, @intCast(ch)));
+        }
     }
 
     pub fn deleteCh(self: *winInput) void {
