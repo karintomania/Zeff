@@ -4,8 +4,8 @@
 😁	Smileys & Emotion	face-smiling	beaming face with smiling eyes	beaming,smile,happy,joy,cheerful,grinning,delighted,pleased,excited,radiant	
 😆	Smileys & Emotion	face-smiling	grinning squinting face	grinning,laughing,happy,joy,squinting,amused,delighted,cheerful,giggling,excited	
 😅	Smileys & Emotion	face-smiling	grinning face with sweat	grinning,nervous,awkward,sweat,relieved,embarrassed,anxious,sheepish,uncomfortable,worried	
-🤣	Smileys & Emotion	face-smiling	rolling on the floor laughing	rolling,laughing,hilarious,funny,hysterical,rofl,amused,giggling,cracking,comedy	
-😂	Smileys & Emotion	face-smiling	face with tears of joy	laughing,tears,joy,funny,hilarious,amused,crying,happy,giggling,hysterical	
+🤣	Smileys & Emotion	face-smiling	rolling on the floor laughing	rolling,laughing,hilarious,funny,hysterical,rofl,amused,giggling,cracking,comedy,lol	
+😂	Smileys & Emotion	face-smiling	face with tears of joy	laughing,tears,joy,funny,hilarious,amused,crying,happy,giggling,hysterical,lol	
 🙂	Smileys & Emotion	face-smiling	slightly smiling face	smiling,slight,content,pleasant,happy,mild,gentle,polite,friendly,satisfied	
 🙃	Smileys & Emotion	face-smiling	upside-down face	upside,down,silly,sarcastic,ironic,playful,weird,joking,flipped,humor	
 🫠	Smileys & Emotion	face-smiling	melting face	melting,hot,dissolving,overwhelmed,exhausted,defeated,liquefying,tired,drained,stressed	
@@ -32,7 +32,7 @@
 🫢	Smileys & Emotion	face-hand	face with open eyes and hand over mouth	surprised,shocked,gasp,oops,amazed,stunned,disbelief,wow,astonished,speechless	
 🫣	Smileys & Emotion	face-hand	face with peeking eye	peeking,shy,hiding,curious,sneaky,bashful,timid,scared,nervous,watching	
 🤫	Smileys & Emotion	face-hand	shushing face	shush,quiet,silence,secret,whisper,hush,shh,confidential,private,sssh	
-🤔	Smileys & Emotion	face-hand	thinking face	thinking,pondering,considering,contemplating,wondering,curious,puzzled,confused,thoughtful,hmm	
+🤔	Smileys & Emotion	face-hand	thinking face	thinking,pondering,considering,contemplating,wondering,curious,puzzled,confused,questioning,hmm	
 🫡	Smileys & Emotion	face-hand	saluting face	salute,military,respect,honor,acknowledgment,formal,greeting,yes,sir,obedient	
 🤐	Smileys & Emotion	face-neutral-skeptical	zipper-mouth face	zipper,mouth,quiet,silence,sealed,secret,mute,closed,zip,shh	
 🤨	Smileys & Emotion	face-neutral-skeptical	face with raised eyebrow	raised,eyebrow,skeptical,suspicious,doubtful,questioning,really,seriously,hmm,dubious	
@@ -1072,7 +1072,7 @@
 🎊	Activities	event	confetti ball	confetti ball,confetti,celebration,party,colorful,burst	
 🎋	Activities	event	tanabata tree	tanabata tree,japanese,festival,star,wish,bamboo	
 🎍	Activities	event	pine decoration	pine decoration,japanese,new year,kadomatsu,bamboo,lucky	
-🎎	Activities	event	Japanese dolls	japanese dolls,hinaまつり,hina matsuri,girls' day,traditional	
+🎎	Activities	event	Japanese dolls	japanese dolls, hina matsuri,girls' day,traditional	
 🎏	Activities	event	carp streamer	carp streamer,koinobori,japanese,children's day,fish,flag	
 🎐	Activities	event	wind chime	wind chime,chime,bell,sound,breeze,decorate	
 🎑	Activities	event	moon viewing ceremony	moon viewing ceremony,tsukimi,japanese,autumn,moon,harvest	
