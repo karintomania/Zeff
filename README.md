@@ -6,6 +6,11 @@ Zeff is a blazing-fast command-line interface (CLI) tool that helps you quickly 
 
 ---
 
+# Background
+
+I'm an Ubuntu user, and I love Ubuntu. However, it doesn't come with the right tool to find emojis. (Yes, there is a default "Characters" app, but you have to know the official name of the emoji, which I rarely do.)
+I constantly find myself opening a browser and searching on Google just to copy and paste an emoji. I wanted something fast and easily accessible from my terminal. That's why I built Zeff.
+
 # Why Choose Zeff?
 
 ## 🚀 Blazing Fast & Lightweight
@@ -21,7 +26,17 @@ For example, you can find the 🤪 emoji by simply searching for "crazy," even t
 
 ## 💻 Simple CLI Tool
 
-You can use Zeff directly from your terminal without any GUI. It's simple.
+You can use Zeff directly from your terminal without any GUI.
+Because it prints the result on stdout, you can pipe Zeff or use it with a command substitution.
+
+```
+# Copy the selected emoji to clipboard
+zeff | wl-copy
+
+# Use emoji in the commit message
+ git commit -m "Update readme $(zeff)"
+```
+
 
 # How to Use
 
