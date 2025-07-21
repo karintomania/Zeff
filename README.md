@@ -25,7 +25,7 @@ You can use Zeff directly from your terminal without any GUI. It's simple.
 
 # How to Use
 
-### Prerequisites
+## Prerequisites
 
 Zeff requires `ncurses` to be installed on your system. You can typically install it using your distribution's package manager. Here's an example for Ubuntu:
 
@@ -33,7 +33,7 @@ Zeff requires `ncurses` to be installed on your system. You can typically instal
 sudo apt-get install libncurses5-dev libncursesw5-dev
 ```
 
-# Install
+## Install
 Currently, Zeff is only available by building the binary from the source code.
 Clone this repo and run `make build`. The binary will be in `zig-out/bin/zeff`.
 
@@ -43,7 +43,7 @@ Clone this repo and run `make build`. The binary will be in `zig-out/bin/zeff`.
 The fuzzy search algorithm is heavily inspired by this excellent repo: https://github.com/philj56/fuzzy-match by @philj56.
 
 # TODOs
- -[] Improvde keywords
- -[] Skin tones
- -[] Search hisotry
+- [ ] Improve keywords  
+- [ ] Skin tones  
+- [ ] Search history  
 
