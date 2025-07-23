@@ -37,15 +37,22 @@ zeff | wl-copy
  git commit -m "Update readme $(zeff)"
 ```
 
-
 # How to Use
 
 ## Prerequisites
 
-Zeff requires `ncurses` to be installed on your system. You can typically install it using your distribution's package manager. Here's an example for Ubuntu:
+Zeff requires `ncurses` to be installed on your system. You can typically install it using your distribution's package manager.
 
+Here's how to install ncurses for Ubuntu and macOS.
+
+### Ubuntu
 ```bash
 sudo apt-get install libncurses5-dev libncursesw5-dev
+```
+
+### macOS
+```bash
+brew install ncurses
 ```
 
 ## Install

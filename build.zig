@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
@@ -35,6 +36,15 @@ pub fn build(b: *std.Build) void {
 
     // Add libc and ncursesw
     exe.linkLibC();
+
+    if (builtin.target.os.tag == .macos) {
+        // mac
+        const lib_path: std.Build.LazyPath = .{
+            .cwd_relative = "/opt/homebrew/opt/ncurses/lib"
+        };
+        exe.addLibraryPath(lib_path);
+    }
+
     exe.linkSystemLibrary("ncursesw");
 
     // This declares intent for the executable to be installed into the

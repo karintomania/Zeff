@@ -229,7 +229,7 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     _ = c.setlocale(c.LC_ALL, "");
 
     // use newterm instead of initscr(). This enables linux pipe like $ zeff | x-copy
-    _ = c.newterm(null, c.stderr, c.stdin);
+    _ = c.newterm(null, c.stderr(), c.stdin());
 
     defer _ = c.endwin();
 
