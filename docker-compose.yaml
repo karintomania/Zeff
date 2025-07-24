@@ -1,0 +1,8 @@
+services:
+  zeff:
+    platform: linux/amd64
+    build: .
+    entrypoint: ["zig", "build", "-Doptimize=ReleaseSmall", "-Dname=zeff-Linux-x86_64"]
+    # entrypoint: ["sleep", "infinity"]
+    volumes:
+      - .:/app

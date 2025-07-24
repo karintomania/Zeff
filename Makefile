@@ -1,13 +1,7 @@
-.PHONY: build-watch run-watch test-watch format build copy install
+.PHONY: build-watch run-watch test-watch format build copy install release-build docker-shell
 
 build-watch:
 	zig build -fincremental --watch --debounce 1000
-
-run-watch:
-	zig build -fincremental --watch --debounce 1000 run
-
-test-watch:
-	zig build -fincremental --watch --debounce 1000 test
 
 format:
 	zig fmt .
@@ -18,4 +12,11 @@ build:
 copy:
 	cp zig-out/bin/zeff ~/.local/bin;
 
+release-build:
+	zig build  -Doptimize=ReleaseSmall -Dname=zeff-Darwin-arm64
+	docker compose up
+
 install: build copy
+
+docker-shell:
+	docker compose exec zeff -it /bin/bash
