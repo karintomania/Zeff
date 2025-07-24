@@ -56,7 +56,11 @@ brew install ncurses
 ```
 
 ## Install
-Currently, Zeff is only available by building the binary from the source code.
+### Pre-built Binary
+Pre-built bninaries for Linux (x86_64) and macOS (arm64) is available from the [release page](https://github.com/karintomania/Zeff/releases).
+
+
+### Build from source
 Clone this repo and run `make build`. The binary will be in `zig-out/bin/zeff`.
 
 **Note:** You need zig v0.14.1 to build.
