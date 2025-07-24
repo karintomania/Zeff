@@ -46,6 +46,9 @@ pub fn build(b: *std.Build) void {
     }
 
     exe.linkSystemLibrary("ncursesw");
+    
+
+    exe.addIncludePath(b.path("c-src"));
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

@@ -6,6 +6,7 @@ const search = @import("../search/search.zig").search;
 const SearchResult = @import("../search/search.zig").SearchResult;
 
 const c = @cImport({
+    @cInclude("stdwrap.c");
     @cInclude("locale.h");
     @cInclude("ncurses.h");
 });
@@ -229,7 +230,7 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     _ = c.setlocale(c.LC_ALL, "");
 
     // use newterm instead of initscr(). This enables linux pipe like $ zeff | x-copy
-    _ = c.newterm(null, c.stderr(), c.stdin());
+    _ = c.newterm(null, c.getstderr(), c.getstdin());
 
     defer _ = c.endwin();
 
