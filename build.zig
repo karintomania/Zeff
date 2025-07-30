@@ -42,14 +42,11 @@ pub fn build(b: *std.Build) void {
 
     if (builtin.target.os.tag == .macos) {
         // mac
-        const lib_path: std.Build.LazyPath = .{
-            .cwd_relative = "/opt/homebrew/opt/ncurses/lib"
-        };
+        const lib_path: std.Build.LazyPath = .{ .cwd_relative = "/opt/homebrew/opt/ncurses/lib" };
         exe.addLibraryPath(lib_path);
     }
 
     exe.linkSystemLibrary("ncursesw");
-    
 
     exe.addIncludePath(b.path("c-src"));
 

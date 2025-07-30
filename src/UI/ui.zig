@@ -4,6 +4,8 @@ const Allocator = std.mem.Allocator;
 const Emojis = @import("../emoji/emojis.zig").Emojis;
 const search = @import("../search/search.zig").search;
 const SearchResult = @import("../search/search.zig").SearchResult;
+const State = @import("state.zig").State;
+const handleKey = @import("state.zig").handleKey;
 
 const c = @cImport({
     @cInclude("stdwrap.c");
@@ -12,11 +14,8 @@ const c = @cImport({
 });
 
 const result_row_offset = 1;
-const visible_result = 10;
-const default_limit = 100;
 
 const input_row_offset = 1;
-const input_limit = 30;
 const input_prefix: []const u8 = " > ";
 const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
@@ -28,72 +27,38 @@ const color_green: c_short = 3;
 
 const winResult = struct {
     win: *c.WINDOW,
-    cursor_idx: c_int,
-    cursor_max_idx: c_int,
-    top_result_idx: usize,
-    results: []SearchResult,
-    emojis: *const Emojis,
 
-    pub fn init(emojis: *const Emojis) winResult {
-        const win = c.newwin(visible_result + 3, 60, 6, 0).?;
+    pub fn init(state: *State) winResult {
+        const win = c.newwin(state.max_visible_result + 3, 60, 6, 0).?;
 
         return winResult{
             .win = win,
-            .cursor_idx = 0,
-            .cursor_max_idx = 0,
-            .top_result_idx = 0,
-            .emojis = emojis,
-            .results = &.{},
         };
     }
 
-    pub fn updateQuery(self: *winResult, query: []const u8, allocator: Allocator) !void {
-        allocator.free(self.results);
+    pub fn draw(self: *winResult, state: *State, allocator: Allocator) !void {
+        defer _ = c.wrefresh(self.win);
 
-        // reset the top_result_idx with query update
-        self.top_result_idx = 0;
-
-        if (query.len > 0) {
-            self.results = try search(query, default_limit, self.emojis.emojis, allocator);
-        } else {
-            // TODO: show history if the query is empty
-            self.cursor_idx = 0;
-            self.cursor_max_idx = 0;
-            self.results = &.{};
-        }
-
-        if (self.results.len > 0) {
-            self.cursor_max_idx = @min(@as(c_int, @intCast(self.results.len - 1)), visible_result - 1);
-
-            self.cursor_idx = @min(self.cursor_idx, self.cursor_max_idx);
-        } else {
-            self.cursor_max_idx = 0;
-            self.cursor_idx = 0;
-        }
-    }
-
-    pub fn draw(self: *winResult, allocator: Allocator) !void {
         _ = c.wclear(self.win);
 
         // print result number
         _ = c.wattron(self.win, c.COLOR_PAIR(color_green));
-        _ = c.mvwprintw(self.win, 0, 0, "Result: %d", self.results.len);
+        _ = c.mvwprintw(self.win, 0, 0, "Result: %d", state.results.len);
         _ = c.wattroff(self.win, c.COLOR_PAIR(color_green));
 
         // print result
-        for (self.results, 0..) |result, result_idx| {
-            if (result_idx < self.top_result_idx) {
+        for (state.results, 0..) |result, result_idx| {
+            if (result_idx < state.top_result_idx) {
                 continue; // Skip self.results before the top idx
             }
 
             // i is the position in result list
-            const i = result_idx - self.top_result_idx;
-
+            const i = result_idx - state.top_result_idx;
 
             const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
 
             _ = c.mvwprintw(self.win, @as(c_int, @intCast(i)) + result_row_offset, 2, result_str);
-            if (i == self.cursor_idx) {
+            if (i == state.cursor_idx) {
                 // print selection cursor
                 _ = c.mvwprintw(self.win, @as(c_int, @intCast(i)) + result_row_offset, 0, cursor_symbol.ptr);
 
@@ -103,65 +68,26 @@ const winResult = struct {
 
             allocator.free(result_str);
 
-            if (i >= visible_result - 1 or i >= self.results.len - 1) {
-                break; // Limit to visible self.results
+            if (i >= state.max_visible_result - 1 or i >= state.results.len - 1) {
+                break; // Limit to visible state.results
             }
         }
-
-
-        _ = c.wrefresh(self.win);
-    }
-
-    pub fn moveCursorUp(self: *winResult) void {
-        // Move cursor up
-        if (self.cursor_idx > 0) {
-            self.cursor_idx -= 1;
-        } else if (self.cursor_idx == 0 and self.top_result_idx > 0) {
-            self.top_result_idx = self.top_result_idx - 1;
-        }
-    }
-
-    pub fn moveCursorDown(self: *winResult) void {
-        if (self.results.len == 0 or self.cursor_idx >= self.results.len - 1) {
-            return;
-        }
-
-        if (self.cursor_idx == self.cursor_max_idx and self.results.len - 1 > (self.top_result_idx + @as(usize, @intCast(self.cursor_idx)))) {
-            // scroll the resslt
-            self.top_result_idx += 1;
-        } else if (self.cursor_idx < self.cursor_max_idx) {
-            self.cursor_idx += 1;
-        }
-    }
-
-    pub fn getSelectedEmoji(self: *winResult) ?*const Emoji {
-        if (self.results.len == 0) {
-            return null; // No results found
-        }
-
-        const selected_index = @as(usize, @intCast(self.cursor_idx)) + self.top_result_idx;
-
-        const selected_emoji = self.results[selected_index].emoji;
-
-        return selected_emoji;
     }
 };
 
 const winInput = struct {
     win: *c.WINDOW,
-    input_buf: *std.ArrayList(u8),
 
-    pub fn init(input_buf: *std.ArrayList(u8)) winInput {
+    pub fn init() winInput {
         const win = c.newwin(3, 40, 1, 0).?;
         _ = c.keypad(win, true);
 
         return winInput{
             .win = win,
-            .input_buf = input_buf,
         };
     }
 
-    pub fn draw(self: *winInput) void {
+    pub fn draw(self: *winInput, state: *State) void {
         _ = c.wclear(self.win);
 
         _ = c.wattron(self.win, c.COLOR_PAIR(color_cyan));
@@ -174,19 +100,19 @@ const winInput = struct {
         _ = c.wattroff(self.win, c.COLOR_PAIR(color_cyan));
 
         // print input_buf
-        if (self.input_buf.items.len > 0) {
+        if (state.input_buf.items.len > 0) {
             _ = c.mvwprintw(
                 self.win,
                 1,
                 input_row_offset + input_prefix_len,
                 "%.*s",
-                @as(c_int, @intCast(self.input_buf.items.len)),
-                self.input_buf.items.ptr,
+                @as(c_int, @intCast(state.input_buf.items.len)),
+                state.input_buf.items.ptr,
             );
         }
 
         // move input cursor to next letter
-        const input_cursor_pos: c_int = input_row_offset + @as(c_int, @intCast(self.input_buf.items.len)) + input_prefix_len;
+        const input_cursor_pos: c_int = input_row_offset + @as(c_int, @intCast(state.input_buf.items.len)) + input_prefix_len;
 
         _ = c.wmove(self.win, 1, input_cursor_pos);
 
@@ -198,21 +124,8 @@ const winInput = struct {
         return ch;
     }
 
-    pub fn appendInputBuf(self: *winInput, ch: c_int) !void {
-        if (self.input_buf.items.len < input_limit) {
-            try self.input_buf.append(@as(u8, @intCast(ch)));
-        }
-    }
-
-    pub fn deleteLastInputBuf(self: *winInput) void {
-        // Handle backspace, delete
-        if (self.input_buf.items.len > 0) {
-            _ = self.input_buf.pop();
-        }
-    }
-
     pub fn deinit(self: *winInput) void {
-        self.input_buf.deinit();
+        _ = self;
     }
 };
 
@@ -222,7 +135,12 @@ fn drawWinInstruction() void {
     _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
 
     _ = c.wrefresh(win_instruction);
+}
 
+fn initColors() void {
+    _ = c.init_pair(color_cyan, c.COLOR_CYAN, -1);
+    _ = c.init_pair(color_blue, c.COLOR_BLUE, -1);
+    _ = c.init_pair(color_green, c.COLOR_GREEN, -1);
 }
 
 pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
@@ -244,54 +162,26 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
 
     drawWinInstruction();
 
-    var win_result = winResult.init(emojis);
+    var state = try State.init(emojis, allocator);
+    defer state.deinit();
 
-    var input_buf = std.ArrayList(u8).init(allocator);
-    var win_input = winInput.init(&input_buf);
+    var win_result = winResult.init(&state);
+
+    var win_input = winInput.init();
     defer win_input.deinit();
 
     while (true) {
         // Draw
-        try win_result.draw(allocator);
-        win_input.draw();
+        try win_result.draw(&state, allocator);
+        win_input.draw(&state);
 
         // Read and Process Ch
         const ch: c_int = win_input.readCh();
 
-        if (ch == c.KEY_BACKSPACE or ch == 127 or ch == 8) {
-            win_input.deleteLastInputBuf();
+        const emoji = try handleKey(ch, &state);
 
-            try win_result.updateQuery(win_input.input_buf.items, allocator);
-        } else if (isValidCharacter(ch)) {
-            try win_input.appendInputBuf(ch);
-
-            try win_result.updateQuery(win_input.input_buf.items, allocator);
-        }
-
-        // Move cursor
-        if (ch == c.KEY_UP) {
-            win_result.moveCursorUp();
-        } else if (ch == c.KEY_DOWN) {
-            win_result.moveCursorDown();
-        }
-
-        // handle Enter
-        if (ch == 10 or ch == 13) {
-            break;
+        if (emoji != null) {
+            return emoji;
         }
     }
-
-    const selected_emoji = win_result.getSelectedEmoji();
-
-    return selected_emoji;
-}
-
-fn initColors() void {
-    _ = c.init_pair(color_cyan, c.COLOR_CYAN, -1);
-    _ = c.init_pair(color_blue, c.COLOR_BLUE, -1);
-    _ = c.init_pair(color_green, c.COLOR_GREEN, -1);
-}
-
-fn isValidCharacter(ch: c_int) bool {
-    return (ch >= '0' and ch <= '9') or (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z') or ch == ' ';
 }
