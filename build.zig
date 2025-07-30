@@ -50,6 +50,13 @@ pub fn build(b: *std.Build) void {
 
     exe.addIncludePath(b.path("c-src"));
 
+    const ztb = b.dependency("zig_termbox2_wrapper", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    exe.root_module.addImport("ztb", ztb.module("zig_termbox2_wrapper"));
+
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).
