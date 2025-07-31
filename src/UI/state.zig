@@ -4,6 +4,13 @@ const Allocator = std.mem.Allocator;
 const Emojis = @import("../emoji/emojis.zig").Emojis;
 const search = @import("../search/search.zig").search;
 const SearchResult = @import("../search/search.zig").SearchResult;
+const ztb = @import("ztb");
+
+pub const KeyHandleResult = union(enum) {
+    emoji: *const Emoji,
+    finish_program,
+    continue_processing,
+};
 
 pub const State = struct {
     cursor_idx: c_int,
@@ -41,26 +48,33 @@ pub const State = struct {
     }
 };
 
-pub fn handleKey(ch: c_int, state: *State) !?*const Emoji {
-    if (ch == 0o407 or ch == 127 or ch == 8) {
+pub fn handleKey(key: i32, state: *State) !KeyHandleResult {
+    if (key == ztb.KEY_BACKSPACE or key == ztb.KEY_BACKSPACE2) {
         try handleDeleteKey(state);
-    } else if (isValidCharacter(ch)) {
-        try handleAlphabet(state, ch);
+    } else if (isValidCharacter(key)) {
+        try handleAlphabet(state, key);
     }
 
     // Move cursor
-    if (ch == 0o403) {
+    if (key == ztb.KEY_ARROW_UP) {
         try handleArrowUp(state);
-    } else if (ch == 0o402) {
+    } else if (key == ztb.KEY_ARROW_DOWN) {
         try handleArrowDown(state);
     }
 
     // handle Enter
-    if (ch == 10 or ch == 13) {
-        return getSelectedEmoji(state);
+    if (key == ztb.KEY_ENTER) {
+        if (getSelectedEmoji(state)) |emoji| {
+            return KeyHandleResult{ .emoji = emoji };
+        }
     }
 
-    return null;
+    // handle Ctrl+C
+    if (key == ztb.KEY_CTRL_C) {
+        return KeyHandleResult.finish_program;
+    }
+
+    return KeyHandleResult.continue_processing;
 }
 
 fn handleDeleteKey(state: *State) !void {
@@ -71,7 +85,7 @@ fn handleDeleteKey(state: *State) !void {
     try updateQuery(state);
 }
 
-fn handleAlphabet(state: *State, ch: c_int) !void {
+fn handleAlphabet(state: *State, ch: i32) !void {
     if (state.input_buf.items.len < state.input_limit) {
         try state.input_buf.append(@as(u8, @intCast(ch)));
     }
@@ -140,6 +154,6 @@ fn updateQuery(state: *State) !void {
     }
 }
 
-fn isValidCharacter(ch: c_int) bool {
+fn isValidCharacter(ch: i32) bool {
     return (ch >= '0' and ch <= '9') or (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z') or ch == ' ';
 }

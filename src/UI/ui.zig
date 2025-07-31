@@ -6,12 +6,8 @@ const search = @import("../search/search.zig").search;
 const SearchResult = @import("../search/search.zig").SearchResult;
 const State = @import("state.zig").State;
 const handleKey = @import("state.zig").handleKey;
-
-const c = @cImport({
-    @cInclude("stdwrap.c");
-    @cInclude("locale.h");
-    @cInclude("ncurses.h");
-});
+const KeyHandleResult = @import("state.zig").KeyHandleResult;
+const ztb = @import("ztb");
 
 const result_row_offset = 1;
 
@@ -21,30 +17,28 @@ const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
 const cursor_symbol: []const u8 = "> ";
 
-const color_cyan: c_short = 1;
-const color_blue: c_short = 2;
-const color_green: c_short = 3;
+const color_cyan = ztb.CYAN;
+const color_blue = ztb.BLUE;
+const color_green = ztb.GREEN;
 
 const winResult = struct {
-    win: *c.WINDOW,
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
 
     pub fn init(state: *State) winResult {
-        const win = c.newwin(state.max_visible_result + 3, 60, 6, 0).?;
-
         return winResult{
-            .win = win,
+            .x = 0,
+            .y = 6,
+            .width = 60,
+            .height = state.max_visible_result + 3,
         };
     }
 
     pub fn draw(self: *winResult, state: *State, allocator: Allocator) !void {
-        defer _ = c.wrefresh(self.win);
-
-        _ = c.wclear(self.win);
-
         // print result number
-        _ = c.wattron(self.win, c.COLOR_PAIR(color_green));
-        _ = c.mvwprintw(self.win, 0, 0, "Result: %d", state.results.len);
-        _ = c.wattroff(self.win, c.COLOR_PAIR(color_green));
+        try ztb.printf(self.x, self.y, color_green, ztb.DEFAULT, "Result: {d}", .{state.results.len});
 
         // print result
         for (state.results, 0..) |result, result_idx| {
@@ -55,18 +49,19 @@ const winResult = struct {
             // i is the position in result list
             const i = result_idx - state.top_result_idx;
 
-            const result_str = try std.fmt.allocPrintZ(allocator, "{s}\t{s}", .{ result.emoji.character, result.label });
+            const result_str = try std.fmt.allocPrint(allocator, "{s} {s}", .{ result.emoji.character, result.label });
+            defer allocator.free(result_str);
 
-            _ = c.mvwprintw(self.win, @as(c_int, @intCast(i)) + result_row_offset, 2, result_str);
+            const y_pos = self.y + @as(i32, @intCast(i)) + result_row_offset;
+            
             if (i == state.cursor_idx) {
                 // print selection cursor
-                _ = c.mvwprintw(self.win, @as(c_int, @intCast(i)) + result_row_offset, 0, cursor_symbol.ptr);
-
-                // make the line bold and green
-                _ = c.mvwchgat(self.win, @as(c_int, @intCast(i)) + result_row_offset, 1, -1, c.A_BOLD, color_blue, null);
+                try ztb.print(self.x, y_pos, ztb.DEFAULT, ztb.DEFAULT, cursor_symbol);
+                // print the result with bold and blue
+                try ztb.print(self.x + 2, y_pos, color_blue | ztb.BOLD, ztb.DEFAULT, result_str);
+            } else {
+                try ztb.print(self.x + 2, y_pos, ztb.DEFAULT, ztb.DEFAULT, result_str);
             }
-
-            allocator.free(result_str);
 
             if (i >= state.max_visible_result - 1 or i >= state.results.len - 1) {
                 break; // Limit to visible state.results
@@ -76,52 +71,67 @@ const winResult = struct {
 };
 
 const winInput = struct {
-    win: *c.WINDOW,
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
 
     pub fn init() winInput {
-        const win = c.newwin(3, 40, 1, 0).?;
-        _ = c.keypad(win, true);
-
         return winInput{
-            .win = win,
+            .x = 0,
+            .y = 1,
+            .width = 40,
+            .height = 3,
         };
     }
 
-    pub fn draw(self: *winInput, state: *State) void {
-        _ = c.wclear(self.win);
+    pub fn draw(self: *winInput, state: *State) !void {
+        try self.drawBox();
 
-        _ = c.wattron(self.win, c.COLOR_PAIR(color_cyan));
-        _ = c.box(self.win, 0, 0);
+        // Print title
+        try ztb.print(self.x + input_row_offset + 1, self.y, color_cyan, ztb.DEFAULT, "Type keywords 🔍 ");
 
-        _ = c.mvwprintw(self.win, 0, input_row_offset + 1, "Type keywords 🔍 ");
+        // Print input prefix
+        try ztb.print(self.x + input_row_offset, self.y + 1, ztb.DEFAULT, ztb.DEFAULT, input_prefix);
 
-        _ = c.mvwprintw(self.win, 1, input_row_offset, input_prefix.ptr);
-
-        _ = c.wattroff(self.win, c.COLOR_PAIR(color_cyan));
-
-        // print input_buf
+        // Print input buffer
         if (state.input_buf.items.len > 0) {
-            _ = c.mvwprintw(
-                self.win,
-                1,
-                input_row_offset + input_prefix_len,
-                "%.*s",
-                @as(c_int, @intCast(state.input_buf.items.len)),
-                state.input_buf.items.ptr,
+            try ztb.print(
+                self.x + input_row_offset + input_prefix_len,
+                self.y + 1,
+                ztb.DEFAULT,
+                ztb.DEFAULT,
+                state.input_buf.items
             );
         }
 
-        // move input cursor to next letter
-        const input_cursor_pos: c_int = input_row_offset + @as(c_int, @intCast(state.input_buf.items.len)) + input_prefix_len;
-
-        _ = c.wmove(self.win, 1, input_cursor_pos);
-
-        _ = c.wrefresh(self.win);
+        // Set cursor position
+        const cursor_x = self.x + input_row_offset + @as(i32, @intCast(state.input_buf.items.len)) + input_prefix_len;
+        try ztb.setCursor(cursor_x, self.y + 1);
     }
 
-    pub fn readCh(self: *winInput) c_int {
-        const ch: c_int = c.wgetch(self.win);
-        return ch;
+    fn drawBox(self: *winInput) !void {
+        // Draw box border with cyan color using Unicode box drawing characters
+        for (0..@as(usize, @intCast(self.width))) |x| {
+            try ztb.setCell(self.x + @as(i32, @intCast(x)), self.y, '─', color_cyan, ztb.DEFAULT);
+            try ztb.setCell(self.x + @as(i32, @intCast(x)), self.y + self.height - 1, '─', color_cyan, ztb.DEFAULT);
+        }
+        for (0..@as(usize, @intCast(self.height))) |y| {
+            try ztb.setCell(self.x, self.y + @as(i32, @intCast(y)), '│', color_cyan, ztb.DEFAULT);
+            try ztb.setCell(self.x + self.width - 1, self.y + @as(i32, @intCast(y)), '│', color_cyan, ztb.DEFAULT);
+        }
+        // Box corners
+        try ztb.setCell(self.x, self.y, '┌', color_cyan, ztb.DEFAULT);
+        try ztb.setCell(self.x + self.width - 1, self.y, '┐', color_cyan, ztb.DEFAULT);
+        try ztb.setCell(self.x, self.y + self.height - 1, '└', color_cyan, ztb.DEFAULT);
+        try ztb.setCell(self.x + self.width - 1, self.y + self.height - 1, '┘', color_cyan, ztb.DEFAULT);
+    }
+
+    pub fn readCh(self: *winInput) !ztb.Event {
+        _ = self;
+        var event = ztb.newEvent();
+        try ztb.pollEvent(&event);
+        return event;
     }
 
     pub fn deinit(self: *winInput) void {
@@ -129,59 +139,55 @@ const winInput = struct {
     }
 };
 
-fn drawWinInstruction() void {
-    const win_instruction = c.newwin(1, 50, 4, 0);
-
-    _ = c.wprintw(win_instruction, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
-
-    _ = c.wrefresh(win_instruction);
+fn drawWinInstruction() !void {
+    try ztb.print(0, 4, ztb.DEFAULT, ztb.DEFAULT, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
 }
 
-fn initColors() void {
-    _ = c.init_pair(color_cyan, c.COLOR_CYAN, -1);
-    _ = c.init_pair(color_blue, c.COLOR_BLUE, -1);
-    _ = c.init_pair(color_green, c.COLOR_GREEN, -1);
-}
 
 pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
-    // Set locale for UTF-8 support
-    _ = c.setlocale(c.LC_ALL, "");
+    try ztb.init();
+    defer ztb.shutdown();
 
-    // use newterm instead of initscr(). This enables linux pipe like $ zeff | x-copy
-    _ = c.newterm(null, c.getstderr(), c.getstdin());
-
-    defer _ = c.endwin();
-
-    _ = c.noecho();
-    _ = c.cbreak();
-
-    _ = c.start_color();
-    _ = c.use_default_colors();
-
-    initColors();
-
-    drawWinInstruction();
+    try drawWinInstruction();
 
     var state = try State.init(emojis, allocator);
     defer state.deinit();
 
     var win_result = winResult.init(&state);
-
     var win_input = winInput.init();
     defer win_input.deinit();
 
     while (true) {
+        // Clear screen
+        try ztb.clear();
+
         // Draw
         try win_result.draw(&state, allocator);
-        win_input.draw(&state);
+        try win_input.draw(&state);
+        try drawWinInstruction();
 
-        // Read and Process Ch
-        const ch: c_int = win_input.readCh();
+        // Present changes to screen
+        try ztb.present();
 
-        const emoji = try handleKey(ch, &state);
+        // Read and Process Event
+        const event = try win_input.readCh();
 
-        if (emoji != null) {
-            return emoji;
+        // Extract key from ztb event for handleKey function
+        var key: i32 = 0;
+        if (event.type == ztb.EVENT_KEY) {
+            if (event.key != 0) {
+                key = @as(i32, @intCast(event.key));
+            } else if (event.ch != 0) {
+                key = @as(i32, @intCast(event.ch));
+            }
+        }
+
+        const result = try handleKey(key, &state);
+
+        switch (result) {
+            .emoji => |emoji| return emoji,
+            .finish_program => return null,
+            .continue_processing => {},
         }
     }
 }
