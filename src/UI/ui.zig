@@ -17,10 +17,6 @@ const input_prefix_len: c_int = @as(c_int, @intCast(input_prefix.len));
 
 const cursor_symbol: []const u8 = "> ";
 
-const color_cyan = ztb.CYAN;
-const color_blue = ztb.BLUE;
-const color_green = ztb.GREEN;
-
 const winResult = struct {
     x: i32,
     y: i32,
@@ -36,9 +32,9 @@ const winResult = struct {
         };
     }
 
-    pub fn draw(self: *winResult, state: *State, allocator: Allocator) !void {
+    pub fn draw(self: *winResult, state: *State) !void {
         // print result number
-        try ztb.printf(self.x, self.y, color_green, ztb.DEFAULT, "Result: {d}", .{state.results.len});
+        try ztb.printf(self.x, self.y, ztb.GREEN, ztb.DEFAULT, "Result: {d}", .{state.results.len});
 
         // print result
         for (state.results, 0..) |result, result_idx| {
@@ -49,18 +45,17 @@ const winResult = struct {
             // i is the position in result list
             const i = result_idx - state.top_result_idx;
 
-            const result_str = try std.fmt.allocPrint(allocator, "{s} {s}", .{ result.emoji.character, result.label });
-            defer allocator.free(result_str);
-
             const y_pos = self.y + @as(i32, @intCast(i)) + result_row_offset;
             
             if (i == state.cursor_idx) {
                 // print selection cursor
                 try ztb.print(self.x, y_pos, ztb.DEFAULT, ztb.DEFAULT, cursor_symbol);
                 // print the result with bold and blue
-                try ztb.print(self.x + 2, y_pos, color_blue | ztb.BOLD, ztb.DEFAULT, result_str);
+                try ztb.print(self.x + 2, y_pos, ztb.BLUE | ztb.BOLD, ztb.DEFAULT, result.emoji.character);
+                try ztb.print(self.x + 9, y_pos, ztb.BLUE | ztb.BOLD, ztb.DEFAULT, result.label);
             } else {
-                try ztb.print(self.x + 2, y_pos, ztb.DEFAULT, ztb.DEFAULT, result_str);
+                try ztb.print(self.x + 2, y_pos, ztb.DEFAULT, ztb.DEFAULT, result.emoji.character);
+                try ztb.print(self.x + 8, y_pos, ztb.DEFAULT, ztb.DEFAULT, result.label);
             }
 
             if (i >= state.max_visible_result - 1 or i >= state.results.len - 1) {
@@ -89,7 +84,7 @@ const winInput = struct {
         try self.drawBox();
 
         // Print title
-        try ztb.print(self.x + input_row_offset + 1, self.y, color_cyan, ztb.DEFAULT, "Type keywords 🔍 ");
+        try ztb.print(self.x + input_row_offset + 1, self.y, ztb.CYAN, ztb.DEFAULT, "Type keywords 🔍 ");
 
         // Print input prefix
         try ztb.print(self.x + input_row_offset, self.y + 1, ztb.DEFAULT, ztb.DEFAULT, input_prefix);
@@ -113,18 +108,18 @@ const winInput = struct {
     fn drawBox(self: *winInput) !void {
         // Draw box border with cyan color using Unicode box drawing characters
         for (0..@as(usize, @intCast(self.width))) |x| {
-            try ztb.setCell(self.x + @as(i32, @intCast(x)), self.y, '─', color_cyan, ztb.DEFAULT);
-            try ztb.setCell(self.x + @as(i32, @intCast(x)), self.y + self.height - 1, '─', color_cyan, ztb.DEFAULT);
+            try ztb.setCell(self.x + @as(i32, @intCast(x)), self.y, '─', ztb.CYAN, ztb.DEFAULT);
+            try ztb.setCell(self.x + @as(i32, @intCast(x)), self.y + self.height - 1, '─', ztb.CYAN, ztb.DEFAULT);
         }
         for (0..@as(usize, @intCast(self.height))) |y| {
-            try ztb.setCell(self.x, self.y + @as(i32, @intCast(y)), '│', color_cyan, ztb.DEFAULT);
-            try ztb.setCell(self.x + self.width - 1, self.y + @as(i32, @intCast(y)), '│', color_cyan, ztb.DEFAULT);
+            try ztb.setCell(self.x, self.y + @as(i32, @intCast(y)), '│', ztb.CYAN, ztb.DEFAULT);
+            try ztb.setCell(self.x + self.width - 1, self.y + @as(i32, @intCast(y)), '│', ztb.CYAN, ztb.DEFAULT);
         }
         // Box corners
-        try ztb.setCell(self.x, self.y, '┌', color_cyan, ztb.DEFAULT);
-        try ztb.setCell(self.x + self.width - 1, self.y, '┐', color_cyan, ztb.DEFAULT);
-        try ztb.setCell(self.x, self.y + self.height - 1, '└', color_cyan, ztb.DEFAULT);
-        try ztb.setCell(self.x + self.width - 1, self.y + self.height - 1, '┘', color_cyan, ztb.DEFAULT);
+        try ztb.setCell(self.x, self.y, '┌', ztb.CYAN, ztb.DEFAULT);
+        try ztb.setCell(self.x + self.width - 1, self.y, '┐', ztb.CYAN, ztb.DEFAULT);
+        try ztb.setCell(self.x, self.y + self.height - 1, '└', ztb.CYAN, ztb.DEFAULT);
+        try ztb.setCell(self.x + self.width - 1, self.y + self.height - 1, '┘', ztb.CYAN, ztb.DEFAULT);
     }
 
     pub fn readCh(self: *winInput) !ztb.Event {
@@ -162,7 +157,7 @@ pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
         try ztb.clear();
 
         // Draw
-        try win_result.draw(&state, allocator);
+        try win_result.draw(&state);
         try win_input.draw(&state);
         try drawWinInstruction();
 
