@@ -1072,7 +1072,7 @@
 🎊	Activities	event	confetti ball	confetti ball,confetti,celebration,party,colorful,burst	
 🎋	Activities	event	tanabata tree	tanabata tree,japanese,festival,star,wish,bamboo	
 🎍	Activities	event	pine decoration	pine decoration,japanese,new year,kadomatsu,bamboo,lucky	
-🎎	Activities	event	Japanese dolls	japanese dolls, hina matsuri,girls' day,traditional	
+🎎	Activities	event	Japanese dolls	japanese dolls,hina matsuri,girls' day,traditional	
 🎏	Activities	event	carp streamer	carp streamer,koinobori,japanese,children's day,fish,flag	
 🎐	Activities	event	wind chime	wind chime,chime,bell,sound,breeze,decorate	
 🎑	Activities	event	moon viewing ceremony	moon viewing ceremony,tsukimi,japanese,autumn,moon,harvest	
@@ -1531,11 +1531,11 @@
 ⚜️	Symbols	other-symbol	fleur-de-lis	fleur-de-lis,flower,lily,french,symbol,royal	
 🔱	Symbols	other-symbol	trident emblem	trident emblem,trident,poseidon,neptune,sea,power	
 📛	Symbols	other-symbol	name badge	name badge,badge,name,identification,tag,id	
-🔰	Symbols	other-symbol	Japanese symbol for beginner	japanese symbol for beginner,beginner,mark,driving,newbie	
+🔰	Symbols	other-symbol	Japanese symbol for beginner	japanese symbol for beginner,beginner,wakaba,mark,driving,newbie	
 ⭕	Symbols	other-symbol	hollow red circle	hollow red circle,circle,red,zero,o,outline	
 ✅	Symbols	other-symbol	check mark button	check mark button,check,yes,correct,done,approved,success	
-☑️	Symbols	other-symbol	check box with check	check box with check,checkbox,check,select,option,yes	
-✔️	Symbols	other-symbol	check mark	check mark,check,tick,yes,correct,done	
+☑️	Symbols	other-symbol	check box with check	check box with check,checkbox,check,select,option,yes,success	
+✔️	Symbols	other-symbol	check mark	check mark,check,tick,yes,correct,done,success	
 ❌	Symbols	other-symbol	cross mark	cross mark,x,no,wrong,cancel,delete	
 ❎	Symbols	other-symbol	cross mark button	cross mark button,x button,cancel,close,delete,button	
 ➰	Symbols	other-symbol	curly loop	curly loop,loop,swirl,curve,line,knot	
