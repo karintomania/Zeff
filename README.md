@@ -15,7 +15,7 @@ I constantly find myself opening a browser and searching on Google just to copy 
 
 ## 🚀 Blazing Fast & Lightweight
 
-Thanks to Zig, the binary size of Zeff is under 300KB, and it consumes minimal memory (about 2MB on my machine).
+Thanks to Zig, the binary size of Zeff is roughly 300KB, and it consumes minimal memory (about 2MB on my machine).
 
 ## ✨ Smart Fuzzy & Keyword Search
 
@@ -41,19 +41,7 @@ zeff | wl-copy
 
 ## Prerequisites
 
-Zeff requires `ncurses` to be installed on your system. You can typically install it using your distribution's package manager.
-
-Here's how to install ncurses for Ubuntu and macOS.
-
-### Ubuntu
-```bash
-sudo apt-get install libncurses5-dev libncursesw5-dev
-```
-
-### macOS
-```bash
-brew install ncurses
-```
+The only dependency Zeff needs is `libc`, so you don't really need anything extra to install.
 
 ## Install
 ### Pre-built Binary
