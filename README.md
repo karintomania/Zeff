@@ -54,7 +54,8 @@ Clone this repo and run `make build`. The binary will be in `zig-out/bin/zeff`.
 **Note:** You need zig v0.14.1 to build.
 
 # Special Thanks!
-The fuzzy search algorithm is heavily inspired by this excellent repo: https://github.com/philj56/fuzzy-match by @philj56.
+The fuzzy search algorithm is heavily inspired by this excellent repo: https://github.com/philj56/fuzzy-match by @philj56.  
+Zeff uses [termbox2](https://github.com/termbox/termbox2) internallly as a CLI library.  
 
 # TODOs
 - [ ] Improve keywords  
