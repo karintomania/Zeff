@@ -37,21 +37,15 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
 
-    // Add libc and ncursesw
+    // Add libc
     exe.linkLibC();
 
-    if (builtin.target.os.tag == .macos) {
-        // mac
-        const lib_path: std.Build.LazyPath = .{
-            .cwd_relative = "/opt/homebrew/opt/ncurses/lib"
-        };
-        exe.addLibraryPath(lib_path);
-    }
+    const ztb = b.dependency("zig_termbox2_wrapper", .{
+        .target = target,
+        .optimize = optimize,
+    });
 
-    exe.linkSystemLibrary("ncursesw");
-    
-
-    exe.addIncludePath(b.path("c-src"));
+    exe.root_module.addImport("ztb", ztb.module("zig_termbox2_wrapper"));
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

@@ -19,4 +19,4 @@ release-build:
 install: build copy
 
 docker-shell:
-	docker compose exec zeff -it /bin/bash
+	docker compose exec zeff /bin/bash
