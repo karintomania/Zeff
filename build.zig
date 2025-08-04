@@ -40,8 +40,6 @@ pub fn build(b: *std.Build) void {
     // Add libc
     exe.linkLibC();
 
-    exe.addIncludePath(b.path("c-src"));
-
     const ztb = b.dependency("zig_termbox2_wrapper", .{
         .target = target,
         .optimize = optimize,
