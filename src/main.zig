@@ -24,3 +24,7 @@ pub fn main() !void {
         try stdow.print("{s}", .{selected_emoji.?.character});
     }
 }
+
+test {
+     std.testing.refAllDecls(@This());
+}

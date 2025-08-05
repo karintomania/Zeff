@@ -72,13 +72,13 @@ test "search" {
 
     try std.testing.expectEqual(3, results.len);
 
-    try std.testing.expectEqualSlices(u8, "😀", results[0].emoji.character);
+    try std.testing.expectEqualStrings("😀", results[0].emoji.character);
 
-    try std.testing.expectEqualSlices(u8, "grinning face", results[0].label);
+    try std.testing.expectEqualStrings("grinning face", results[0].label);
 
-    try std.testing.expectEqualSlices(u8, "😃", results[1].emoji.character);
+    try std.testing.expectEqualStrings("😃", results[1].emoji.character);
 
-    try std.testing.expectEqualSlices(u8, "😄", results[2].emoji.character);
+    try std.testing.expectEqualStrings("😄", results[2].emoji.character);
 }
 
 test "search with limit" {
@@ -93,7 +93,7 @@ test "search with limit" {
 
     try std.testing.expectEqual(1, results.len);
 
-    try std.testing.expectEqualSlices(u8, "😀", results[0].emoji.character);
+    try std.testing.expectEqualStrings("😀", results[0].emoji.character);
 }
 
 fn getTestEmojisSearch() []const Emoji {
@@ -138,20 +138,20 @@ test "search keywords" {
     try std.testing.expectEqual(3, results.len);
 
     // match with emoji name socres higher
-    try std.testing.expectEqualSlices(u8, "😀", results[0].emoji.character);
+    try std.testing.expectEqualStrings("😀", results[0].emoji.character);
 
     // name as label
-    try std.testing.expectEqualSlices(u8, "Smile Emoji", results[0].label);
+    try std.testing.expectEqualStrings("Smile Emoji", results[0].label);
 
-    try std.testing.expectEqualSlices(u8, "😄", results[1].emoji.character);
-
-    // keyword as label
-    try std.testing.expectEqualSlices(u8, "smile", results[1].label);
-
-    try std.testing.expectEqualSlices(u8, "😃", results[2].emoji.character);
+    try std.testing.expectEqualStrings("😄", results[1].emoji.character);
 
     // keyword as label
-    try std.testing.expectEqualSlices(u8, "smile", results[2].label);
+    try std.testing.expectEqualStrings("smile", results[1].label);
+
+    try std.testing.expectEqualStrings("😃", results[2].emoji.character);
+
+    // keyword as label
+    try std.testing.expectEqualStrings("smile", results[2].label);
 }
 
 fn getTestEmojisKeywords() []const Emoji {
