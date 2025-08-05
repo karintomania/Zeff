@@ -112,7 +112,7 @@ fn getTestEmojisSearch(allocator: Allocator) ![]Emoji {
     const keywords1 = [_][]const u8{ "grin", "smile", "happy" };
     const keywords2 = [_][]const u8{ "grin", "smile", "happy", "joy" };
     const keywords3 = [_][]const u8{ "grin", "smile", "happy", "joy" };
-    
+
     const empty_skin_tones = [_][]const []const u8{
         &[_][]const u8{},
         &[_][]const u8{},
@@ -122,7 +122,7 @@ fn getTestEmojisSearch(allocator: Allocator) ![]Emoji {
     };
 
     var emojis = try allocator.alloc(Emoji, 3);
-    
+
     emojis[0] = try Emoji.init(
         "😀",
         "Smileys & Emotion",
@@ -132,7 +132,7 @@ fn getTestEmojisSearch(allocator: Allocator) ![]Emoji {
         empty_skin_tones,
         allocator,
     );
-    
+
     emojis[1] = try Emoji.init(
         "😄",
         "Smileys & Emotion",
@@ -142,7 +142,7 @@ fn getTestEmojisSearch(allocator: Allocator) ![]Emoji {
         empty_skin_tones,
         allocator,
     );
-    
+
     emojis[2] = try Emoji.init(
         "😃",
         "Smileys & Emotion",
@@ -152,7 +152,7 @@ fn getTestEmojisSearch(allocator: Allocator) ![]Emoji {
         empty_skin_tones,
         allocator,
     );
-    
+
     return emojis;
 }
 
@@ -189,7 +189,7 @@ fn getTestEmojisKeywords(allocator: Allocator) ![]Emoji {
     const keywords1 = [_][]const u8{ "grin", "smile", "happy" };
     const keywords2 = [_][]const u8{ "grin", "smile", "happy", "joy" };
     const keywords3 = [_][]const u8{ "grin", "smile", "happy", "joy" };
-    
+
     const empty_skin_tones = [_][]const []const u8{
         &[_][]const u8{},
         &[_][]const u8{},
@@ -199,7 +199,7 @@ fn getTestEmojisKeywords(allocator: Allocator) ![]Emoji {
     };
 
     var emojis = try allocator.alloc(Emoji, 3);
-    
+
     emojis[0] = try Emoji.init(
         "😀",
         "Smileys & Emotion",
@@ -209,7 +209,7 @@ fn getTestEmojisKeywords(allocator: Allocator) ![]Emoji {
         empty_skin_tones,
         allocator,
     );
-    
+
     emojis[1] = try Emoji.init(
         "😄",
         "Smileys & Emotion",
@@ -219,7 +219,7 @@ fn getTestEmojisKeywords(allocator: Allocator) ![]Emoji {
         empty_skin_tones,
         allocator,
     );
-    
+
     emojis[2] = try Emoji.init(
         "😃",
         "Smileys & Emotion",
@@ -229,6 +229,6 @@ fn getTestEmojisKeywords(allocator: Allocator) ![]Emoji {
         empty_skin_tones,
         allocator,
     );
-    
+
     return emojis;
 }

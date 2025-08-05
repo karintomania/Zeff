@@ -137,7 +137,6 @@ test "EmojiParser handles keywords lines" {
     try testing.expectEqualStrings("😀", grinning.character);
     try testing.expectEqualStrings("grinning face", grinning.name);
     try testing.expectEqual(4, grinning.keywords.len);
-
 }
 
 test "EmojiParser handles skin tones" {
@@ -174,4 +173,3 @@ test "EmojiParser handles skin tones" {
     try testing.expectEqual(1, medium_light_skin.items.len);
     try testing.expectEqualStrings("🧘🏼", medium_light_skin.items[0]);
 }
-

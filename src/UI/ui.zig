@@ -46,7 +46,7 @@ const winResult = struct {
             const i = result_idx - state.top_result_idx;
 
             const y_pos = self.y + @as(i32, @intCast(i)) + result_row_offset;
-            
+
             if (i == state.cursor_idx) {
                 // print selection cursor
                 try ztb.print(self.x, y_pos, ztb.DEFAULT, ztb.DEFAULT, cursor_symbol);
@@ -91,13 +91,7 @@ const winInput = struct {
 
         // Print input buffer
         if (state.input_buf.items.len > 0) {
-            try ztb.print(
-                self.x + input_row_offset + input_prefix_len,
-                self.y + 1,
-                ztb.DEFAULT,
-                ztb.DEFAULT,
-                state.input_buf.items
-            );
+            try ztb.print(self.x + input_row_offset + input_prefix_len, self.y + 1, ztb.DEFAULT, ztb.DEFAULT, state.input_buf.items);
         }
 
         // Set cursor position
@@ -137,7 +131,6 @@ const winInput = struct {
 fn drawWinInstruction() !void {
     try ztb.print(0, 4, ztb.DEFAULT, ztb.DEFAULT, "<↑↓> Move <Enter> Select emoji <Ctrl+C> quit");
 }
-
 
 pub fn startUI(emojis: *const Emojis, allocator: Allocator) !?*const Emoji {
     try ztb.init();

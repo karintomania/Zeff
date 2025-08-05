@@ -7,7 +7,7 @@ pub const EmojiKeywordsPair = struct {
     keywords: [][]const u8,
 
     pub fn initFromLine(line: []const u8, allocator: Allocator) !EmojiKeywordsPair {
-        var tab_split = std.mem.splitSequence(u8, line , "\t");
+        var tab_split = std.mem.splitSequence(u8, line, "\t");
 
         const emoji = tab_split.next() orelse @panic("emoji expected");
 
@@ -26,14 +26,13 @@ pub const EmojiKeywordsPair = struct {
         }
 
         const emojiKeywords = EmojiKeywordsPair{
-            .character=emoji,
-            .keywords=try keywords_list.toOwnedSlice(),
+            .character = emoji,
+            .keywords = try keywords_list.toOwnedSlice(),
         };
 
         return emojiKeywords;
     }
 };
-
 
 test "process adds keywords to emoji" {
     const line = "😀\tgrinning face\tgrinning,smile,happy,joy";

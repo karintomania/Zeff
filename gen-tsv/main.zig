@@ -4,7 +4,7 @@ const parser = @import("parser.zig");
 const Allocator = std.mem.Allocator;
 
 // The output of gen-tsv is input.tsv, which will be the input for Zeff. This is not typo.
-const output_path = "./src/emoji/input.tsv"; 
+const output_path = "./src/emoji/input.tsv";
 
 const input_emoji_path = "./gen-tsv/data/emoji.txt";
 const input_keywords_path = "./gen-tsv/data/keywords.tsv";
@@ -62,5 +62,5 @@ fn readKeywordsFile(emojiParser: *parser.EmojiParser) !void {
 }
 
 test {
-     std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(@This());
 }
