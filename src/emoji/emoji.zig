@@ -4,8 +4,8 @@ const Allocator = std.mem.Allocator;
 
 pub const Emoji = struct {
     character: []const u8,
-    category: []const u8,
-    subcategory: []const u8,
+    group: []const u8,
+    subgroup: []const u8,
     name: []const u8,
     keywords: []const []const u8,
     skin_tones: [5]ArrayList([]const u8),
@@ -70,8 +70,8 @@ pub const Emoji = struct {
 
         return Emoji{
             .character = allocated_character,
-            .category = allocated_category,
-            .subcategory = allocated_subcategory,
+            .group = allocated_category,
+            .subgroup = allocated_subcategory,
             .name = allocated_name,
             .keywords = allocated_keywords,
             .skin_tones = skin_tones,
@@ -84,8 +84,8 @@ pub const Emoji = struct {
 
         try writer.print("{s}\t{s}\t{s}\t{s}\t", .{
             value.character,
-            value.category,
-            value.subcategory,
+            value.group,
+            value.subgroup,
             value.name,
         });
 
@@ -112,8 +112,8 @@ pub const Emoji = struct {
 
     pub fn deinit(self: Emoji, allocator: Allocator) void {
         allocator.free(self.character);
-        allocator.free(self.category);
-        allocator.free(self.subcategory);
+        allocator.free(self.group);
+        allocator.free(self.subgroup);
         allocator.free(self.name);
 
         for (self.keywords) |keyword| {
@@ -169,8 +169,8 @@ test "emoji fromLine" {
     defer emoji.deinit(allocator);
 
     try std.testing.expectEqualSlices(u8, "😀", emoji.character);
-    try std.testing.expectEqualSlices(u8, "Smileys & Emotion", emoji.category);
-    try std.testing.expectEqualSlices(u8, "face-smiling", emoji.subcategory);
+    try std.testing.expectEqualSlices(u8, "Smileys & Emotion", emoji.group);
+    try std.testing.expectEqualSlices(u8, "face-smiling", emoji.subgroup);
     try std.testing.expectEqualSlices(u8, "grinning face", emoji.name);
 
     const expected_keywords = [_][]const u8{ "grin", "smile", "happy" };
@@ -192,8 +192,8 @@ test "emoji skin tones" {
     defer emoji.deinit(allocator);
 
     try std.testing.expectEqualSlices(u8, "🧑", emoji.character);
-    try std.testing.expectEqualSlices(u8, "People & Body", emoji.category);
-    try std.testing.expectEqualSlices(u8, "person", emoji.subcategory);
+    try std.testing.expectEqualSlices(u8, "People & Body", emoji.group);
+    try std.testing.expectEqualSlices(u8, "person", emoji.subgroup);
     try std.testing.expectEqualSlices(u8, "person", emoji.name);
 
     const expected_keywords = [_][]const u8{ "person", "human", "individual", "anyone", "someone" };
@@ -235,8 +235,8 @@ test "Emoji init function" {
     defer emoji.deinit(allocator);
 
     try std.testing.expectEqualSlices(u8, "😀", emoji.character);
-    try std.testing.expectEqualSlices(u8, "Smileys & Emotion", emoji.category);
-    try std.testing.expectEqualSlices(u8, "face-smiling", emoji.subcategory);
+    try std.testing.expectEqualSlices(u8, "Smileys & Emotion", emoji.group);
+    try std.testing.expectEqualSlices(u8, "face-smiling", emoji.subgroup);
     try std.testing.expectEqualSlices(u8, "grinning face", emoji.name);
 
     const expected_keywords = [_][]const u8{ "grin", "smile", "happy" };
@@ -261,8 +261,8 @@ test "Emoji format function" {
 
     const emoji = Emoji{
         .character = "😀",
-        .category = "Smileys & Emotion",
-        .subcategory = "face-smiling",
+        .group = "Smileys & Emotion",
+        .subgroup = "face-smiling",
         .name = "grinning face",
         .keywords = &keywords,
         .skin_tones = [_]ArrayList([]const u8){ArrayList([]const u8).init(std.testing.allocator)} ** 5,

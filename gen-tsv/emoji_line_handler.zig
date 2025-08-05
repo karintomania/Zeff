@@ -1,7 +1,7 @@
 const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
-const Emoji = @import("emoji.zig").Emoji;
+const Emoji = @import("emoji").Emoji;
 const ArrayList = std.ArrayList;
 
 // inalid line includes empty lines and non-fully-qualified emojis
@@ -35,7 +35,7 @@ pub fn parseEmojiLine(
     var commentParts = std.mem.splitSequence(u8, comment, " ");
 
     const emoji_slice = commentParts.next() orelse @panic("No emoji found in line");
-    const emoji = try allocator.dupe(u8, emoji_slice);
+    const character = try allocator.dupe(u8, emoji_slice);
 
     // skip version
     _ = commentParts.next();
@@ -47,15 +47,15 @@ pub fn parseEmojiLine(
         descList.append(part) catch @panic("Failed to append to descList");
     }
 
-    const desc = std.mem.join(allocator, " ", descList.items) catch @panic("Failed to join desc");
+    const name = std.mem.join(allocator, " ", descList.items) catch @panic("Failed to join desc");
 
     const keywords = [_][]const u8{};
 
     return Emoji{
         .group = group,
         .subgroup = subgroup,
-        .emoji = emoji,
-        .desc = desc,
+        .character = character,
+        .name = name,
         .keywords = &keywords,
         .skin_tones = [5]ArrayList([]const u8){
             ArrayList([]const u8).init(allocator),
@@ -132,13 +132,13 @@ test "parseEmojiLine returns parsed Emoji" {
     const subgroup = "face-smiling";
 
     const res = try parseEmojiLine(group, subgroup, emojiLine, testing.allocator);
-    defer testing.allocator.free(res.emoji);
-    defer testing.allocator.free(res.desc);
+    defer testing.allocator.free(res.character);
+    defer testing.allocator.free(res.name);
 
     try testing.expectEqualStrings(group, res.group);
     try testing.expectEqualStrings(subgroup, res.subgroup);
-    try testing.expectEqualStrings("😀", res.emoji);
-    try testing.expectEqualStrings("grinning face", res.desc);
+    try testing.expectEqualStrings("😀", res.character);
+    try testing.expectEqualStrings("grinning face", res.name);
 }
 
 test "parseGroupLine returns group name" {

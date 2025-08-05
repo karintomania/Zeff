@@ -3,6 +3,9 @@
 build-watch:
 	zig build -fincremental --watch --debounce 1000
 
+build-watch-tsv:
+	zig build -fincremental --watch --debounce 1000 gen-tsv
+
 format:
 	zig fmt .
 

@@ -3,7 +3,7 @@ const testing = std.testing;
 const Allocator = std.mem.Allocator;
 
 pub const EmojiKeywordsPair = struct {
-    emoji: []const u8,
+    character: []const u8,
     keywords: [][]const u8,
 
     pub fn initFromLine(line: []const u8, allocator: Allocator) !EmojiKeywordsPair {
@@ -26,7 +26,7 @@ pub const EmojiKeywordsPair = struct {
         }
 
         const emojiKeywords = EmojiKeywordsPair{
-            .emoji=emoji,
+            .character=emoji,
             .keywords=try keywords_list.toOwnedSlice(),
         };
 
