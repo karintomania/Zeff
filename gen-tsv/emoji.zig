@@ -71,12 +71,7 @@ test "Emoji format function" {
         .subgroup = "face-smiling",
         .desc = "grinning face",
         .keywords = &keywords,
-        .skin_tones = [5]ArrayList([]const u8){
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
+        .skin_tones = [_]ArrayList([]const u8){ArrayList([]const u8).init(allocator)} ** 5,
         },
     };
 

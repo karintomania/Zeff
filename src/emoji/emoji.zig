@@ -13,23 +13,68 @@ pub const Emoji = struct {
     pub fn fromLine(line: []const u8, allocator: Allocator) !Emoji {
         var parts = std.mem.splitSequence(u8, line, "\t");
 
-        const character = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
-        const category = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
-        const subcategory = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
-        const name = try allocator.dupe(u8, parts.next() orelse return error.InvalidFormat);
+        const character = parts.next() orelse return error.InvalidFormat;
+        const category = parts.next() orelse return error.InvalidFormat;
+        const subcategory = parts.next() orelse return error.InvalidFormat;
+        const name = parts.next() orelse return error.InvalidFormat;
         const keywords_str = parts.next() orelse return error.InvalidFormat;
-        const skin_tones_str = parts.next() orelse "";
 
-        var keywords_list = try splitStringToArrayList(keywords_str, ",", allocator);
-        var skin_tones_list = try splitStringToArrayList(skin_tones_str, "\t", allocator);
+        const keywords = try splitStringToSlice(keywords_str, ",", allocator);
+        defer allocator.free(keywords);
+
+        var skin_tones_lists = [_][]const []const u8{undefined} ** 5;
+
+        for (0..5) |i| {
+            const skin_tones_str = parts.next() orelse "";
+            skin_tones_lists[i] = try splitStringToSlice(skin_tones_str, ",", allocator);
+        }
+
+        defer {
+            for (skin_tones_lists) |skin_tones_list| {
+                allocator.free(skin_tones_list);
+            }
+        }
+
+        return try init(character, category, subcategory, name, keywords, skin_tones_lists, allocator);
+    }
+
+    pub fn init(
+        character: []const u8,
+        category: []const u8,
+        subcategory: []const u8,
+        name: []const u8,
+        keywords: []const []const u8,
+        skin_tones_lists: [5][]const []const u8,
+        allocator: Allocator,
+    ) !Emoji {
+        const allocated_character = try allocator.dupe(u8, character);
+        const allocated_category = try allocator.dupe(u8, category);
+        const allocated_subcategory = try allocator.dupe(u8, subcategory);
+        const allocated_name = try allocator.dupe(u8, name);
+
+        // Allocate keywords array and duplicate each keyword
+        const allocated_keywords = try allocator.alloc([]const u8, keywords.len);
+        for (keywords, 0..) |keyword, i| {
+            allocated_keywords[i] = try allocator.dupe(u8, keyword);
+        }
+
+        // Initialize skin tones arrays
+        var skin_tones = [_]ArrayList([]const u8){undefined} ** 5;
+        for (0..5) |i| {
+            skin_tones[i] = ArrayList([]const u8).init(allocator);
+            for (skin_tones_lists[i]) |skin_tone| {
+                const allocated_skin_tone = try allocator.dupe(u8, skin_tone);
+                try skin_tones[i].append(allocated_skin_tone);
+            }
+        }
 
         return Emoji{
-            .character = character,
-            .category = category,
-            .subcategory = subcategory,
-            .name = name,
-            .keywords = try keywords_list.toOwnedSlice(),
-            .skin_tones = try skin_tones_list.toOwnedSlice(),
+            .character = allocated_character,
+            .category = allocated_category,
+            .subcategory = allocated_subcategory,
+            .name = allocated_name,
+            .keywords = allocated_keywords,
+            .skin_tones = skin_tones,
         };
     }
 
@@ -39,9 +84,9 @@ pub const Emoji = struct {
 
         try writer.print("{s}\t{s}\t{s}\t{s}\t", .{
             value.character,
-            value.group,
-            value.subgroup,
-            value.desc,
+            value.category,
+            value.subcategory,
+            value.name,
         });
 
         // Display keywords
@@ -76,27 +121,29 @@ pub const Emoji = struct {
         }
 
         for (self.skin_tones) |skin_tone| {
-            allocator.free(skin_tone);
+            for (skin_tone.items) |skin_tone_emoji| {
+                allocator.free(skin_tone_emoji);
+            }
+            skin_tone.deinit();
         }
+
         allocator.free(self.keywords);
-        allocator.free(self.skin_tones);
     }
 };
 
 
-fn splitStringToArrayList(str: []const u8, delimiter: []const u8, allocator: Allocator) !ArrayList([]const u8) {
+fn splitStringToSlice(str: []const u8, delimiter: []const u8, allocator: Allocator) ![]const []const u8 {
     var parts = std.mem.splitSequence(u8, str, delimiter);
 
     var list = ArrayList([]const u8).init(allocator);
+    defer list.deinit();
 
     while (parts.next()) |part| {
         if (part.len == 0) continue; // Skip empty parts
-
-        const allocated_part = try allocator.dupe(u8, part);
-        try list.append(allocated_part);
+        try list.append(part);
     }
 
-    return list;
+    return list.toOwnedSlice();
 }
 
 test "splitStringToArrayList" {
@@ -105,13 +152,11 @@ test "splitStringToArrayList" {
     const input = "apple,banana,cherry";
     const expected = [_][]const u8{ "apple", "banana", "cherry" };
 
-    const result = try splitStringToArrayList(input, ",", allocator);
-    defer result.deinit();
+    const result = try splitStringToSlice(input, ",", allocator);
+    defer allocator.free(result);
 
-    for (0..result.items.len) |i| {
-        try std.testing.expectEqualSlices(u8, expected[i], result.items[i]);
-
-        defer allocator.free(result.items[i]);
+    for (0..result.len) |i| {
+        try std.testing.expectEqualSlices(u8, expected[i], result[i]);
     }
 }
 
@@ -135,13 +180,82 @@ test "emoji fromLine" {
         try std.testing.expectEqualSlices(u8, expected_keywords[i], emoji.keywords[i]);
     }
 
-    try std.testing.expectEqual(0, emoji.skin_tones.len);
+    try std.testing.expectEqual(5, emoji.skin_tones.len);
+}
+
+test "emoji skin tones" {
+    const allocator = std.testing.allocator;
+    const input = "🧑\tPeople & Body\tperson\tperson\tperson,human,individual,anyone,someone\t🧑🏻\t🧑🏼\t🧑🏽\t🧑🏾\t🧑🏿\t";
+
+    const emoji = try Emoji.fromLine(input, allocator);
+
+    defer emoji.deinit(allocator);
+
+    try std.testing.expectEqualSlices(u8, "🧑", emoji.character);
+    try std.testing.expectEqualSlices(u8, "People & Body", emoji.category);
+    try std.testing.expectEqualSlices(u8, "person", emoji.subcategory);
+    try std.testing.expectEqualSlices(u8, "person", emoji.name);
+
+    const expected_keywords = [_][]const u8{ "person", "human", "individual", "anyone", "someone" };
+
+    try std.testing.expectEqual(expected_keywords.len, emoji.keywords.len);
+    for (0..emoji.keywords.len) |i| {
+        try std.testing.expectEqualSlices(u8, expected_keywords[i], emoji.keywords[i]);
+    }
+
+    const expected_skin_tones = [_][]const u8{"🧑🏻", "🧑🏼", "🧑🏽", "🧑🏾", "🧑🏿"};
+
+    try std.testing.expectEqual(5, emoji.skin_tones.len);
+    for (0..5) |i| {
+        try std.testing.expectEqualStrings(expected_skin_tones[i], emoji.skin_tones[i].items[0]);
+    }
+}
+
+test "Emoji init function" {
+    const allocator = std.testing.allocator;
+    
+    const keywords = [_][]const u8{ "grin", "smile", "happy" };
+    const skin_tones_lists = [_][]const []const u8{
+        &[_][]const u8{"🧑🏻"},
+        &[_][]const u8{"🧑🏼"},
+        &[_][]const u8{"🧑🏽"},
+        &[_][]const u8{"🧑🏾"},
+        &[_][]const u8{"🧑🏿"},
+    };
+
+    const emoji = try Emoji.init(
+        "😀",
+        "Smileys & Emotion",
+        "face-smiling",
+        "grinning face",
+        &keywords,
+        skin_tones_lists,
+        allocator,
+    );
+    defer emoji.deinit(allocator);
+
+    try std.testing.expectEqualSlices(u8, "😀", emoji.character);
+    try std.testing.expectEqualSlices(u8, "Smileys & Emotion", emoji.category);
+    try std.testing.expectEqualSlices(u8, "face-smiling", emoji.subcategory);
+    try std.testing.expectEqualSlices(u8, "grinning face", emoji.name);
+
+    const expected_keywords = [_][]const u8{ "grin", "smile", "happy" };
+    try std.testing.expectEqual(expected_keywords.len, emoji.keywords.len);
+    for (0..emoji.keywords.len) |i| {
+        try std.testing.expectEqualSlices(u8, expected_keywords[i], emoji.keywords[i]);
+    }
+
+    try std.testing.expectEqual(5, emoji.skin_tones.len);
+    const expected_skin_tones = [_][]const u8{"🧑🏻", "🧑🏼", "🧑🏽", "🧑🏾", "🧑🏿"};
+    for (0..5) |i| {
+        try std.testing.expectEqual(@as(usize, 1), emoji.skin_tones[i].items.len);
+        try std.testing.expectEqualStrings(expected_skin_tones[i], emoji.skin_tones[i].items[0]);
+    }
 }
 
 test "Emoji format function" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    const allocator = arena.allocator();
 
     var keywords = [_][]const u8{ "happy", "smile" };
 
@@ -151,13 +265,7 @@ test "Emoji format function" {
         .subcategory = "face-smiling",
         .name = "grinning face",
         .keywords = &keywords,
-        .skin_tones = [5]ArrayList([]const u8){
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-            ArrayList([]const u8).init(allocator),
-        },
+        .skin_tones = [_]ArrayList([]const u8){ArrayList([]const u8).init(std.testing.allocator)} ** 5,
     };
 
     var buffer = std.ArrayList(u8).init(std.testing.allocator);
