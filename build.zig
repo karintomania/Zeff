@@ -98,19 +98,32 @@ pub fn build(b: *std.Build) void {
 
 
     {
+        const gen_tsv_module  = b.createModule(.{
+            .root_source_file = b.path("gen-tsv/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+
+        // use emoji module
+        const emoji_module = b.addModule("emoji", .{ 
+            .root_source_file = .{ .src_path = .{ "src/emoji/emoji.zig" } } 
+        });
+
+        gen_tsv_module.addImport("emoji", emoji_module);
+
         // generate input.tsv
         const gen_tsv_step = b.step("gen-tsv", "generate input.tsv");
 
         const build_gen_tsv = b.addExecutable(.{
             .name = "gen-tsv",
-            .root_source_file = b.path("gen-tsv/main.zig"),
-            .target = target,
-            .optimize = optimize,
+            .root_module = gen_tsv_module,
         });
 
         const run_gen_tsv = b.addRunArtifact(build_gen_tsv);
 
         gen_tsv_step.dependOn(&build_gen_tsv.step);
         gen_tsv_step.dependOn(&run_gen_tsv.step);
+
+
     }
 }
