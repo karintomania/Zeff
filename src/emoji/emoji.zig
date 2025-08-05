@@ -8,7 +8,7 @@ pub const Emoji = struct {
     subcategory: []const u8,
     name: []const u8,
     keywords: []const []const u8,
-    skin_tones: []const []const u8,
+    skin_tones: [5]ArrayList([]const u8),
 
     pub fn fromLine(line: []const u8, allocator: Allocator) !Emoji {
         var parts = std.mem.splitSequence(u8, line, "\t");
@@ -33,6 +33,38 @@ pub const Emoji = struct {
         };
     }
 
+    pub fn format(value: Emoji, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
+        _ = fmt;
+        _ = options;
+
+        try writer.print("{s}\t{s}\t{s}\t{s}\t", .{
+            value.character,
+            value.group,
+            value.subgroup,
+            value.desc,
+        });
+
+        // Display keywords
+        for (value.keywords, 0..) |keyword, i| {
+            if (i > 0) try writer.print(",", .{});
+
+            try writer.print("{s}", .{keyword});
+        }
+
+        try writer.print("\t", .{});
+
+        // Display skintones
+        for (value.skin_tones) |skin_tone_list| {
+            if (skin_tone_list.items.len > 0) {
+                for (skin_tone_list.items, 0..) |skin_emoji, j| {
+                    if (j > 0) try writer.print(",", .{});
+                    try writer.print("{s}",.{skin_emoji});
+                }
+                try writer.print("\t", .{});
+            }
+        }
+    }
+
     pub fn deinit(self: Emoji, allocator: Allocator) void {
         allocator.free(self.character);
         allocator.free(self.category);
@@ -50,6 +82,7 @@ pub const Emoji = struct {
         allocator.free(self.skin_tones);
     }
 };
+
 
 fn splitStringToArrayList(str: []const u8, delimiter: []const u8, allocator: Allocator) !ArrayList([]const u8) {
     var parts = std.mem.splitSequence(u8, str, delimiter);
@@ -103,4 +136,35 @@ test "emoji fromLine" {
     }
 
     try std.testing.expectEqual(0, emoji.skin_tones.len);
+}
+
+test "Emoji format function" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var keywords = [_][]const u8{ "happy", "smile" };
+
+    const emoji = Emoji{
+        .character = "😀",
+        .category = "Smileys & Emotion",
+        .subcategory = "face-smiling",
+        .name = "grinning face",
+        .keywords = &keywords,
+        .skin_tones = [5]ArrayList([]const u8){
+            ArrayList([]const u8).init(allocator),
+            ArrayList([]const u8).init(allocator),
+            ArrayList([]const u8).init(allocator),
+            ArrayList([]const u8).init(allocator),
+            ArrayList([]const u8).init(allocator),
+        },
+    };
+
+    var buffer = std.ArrayList(u8).init(std.testing.allocator);
+    defer buffer.deinit();
+
+    try std.fmt.format(buffer.writer(), "{}", .{emoji});
+
+    const expected = "😀\tSmileys & Emotion\tface-smiling\tgrinning face\thappy,smile\t";
+    try std.testing.expectEqualStrings(expected, buffer.items);
 }

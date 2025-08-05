@@ -60,3 +60,7 @@ fn readKeywordsFile(emojiParser: *parser.EmojiParser) !void {
         try emojiParser.handleKeywordsLine(line);
     }
 }
+
+test {
+     std.testing.refAllDecls(@This());
+}

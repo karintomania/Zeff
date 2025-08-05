@@ -2,6 +2,7 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
+const OriginEmoji = @import("emoji").Emoji;
 
 pub const Emoji = struct {
     emoji: []const u8,
@@ -43,6 +44,19 @@ pub const Emoji = struct {
         }
     }
 };
+
+test "test origin" {
+    const origin_emoji = OriginEmoji{
+        .character = "🦓",
+        .category = "animal",
+        .subcategory = "animal",
+        .name = "zebra",
+        .keywords = &.{},
+        .skin_tones = &.{},
+    };
+
+    try testing.expectEqualStrings("🦓a", origin_emoji.character);
+}
 
 test "Emoji format function" {
     var arena = std.heap.ArenaAllocator.init(testing.allocator);
