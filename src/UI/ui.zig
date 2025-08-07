@@ -173,7 +173,7 @@ const winSkinTone = struct {
                         if (state.skin_tone.skin_tone_type == .simple) {
                             try ztb.printf(x + 8, y, fg, ztb.DEFAULT, "  ({d})  ", .{i + 1});
                         } else if (state.skin_tone.skin_tone_type == .combined) {
-                            try ztb.printf(x + 8, y, fg, ztb.DEFAULT, " ({d},{d}) ", .{ i + 1, j + 1 });
+                            try ztb.printf(x + 8, y, fg, ztb.DEFAULT, "  ({d},{d}) ", .{ i + 1, j + 1 });
                         }
 
                         y += 1;

@@ -83,20 +83,52 @@ pub fn getSkinToneIndex(emoji: *Emoji, line: []const u8, allocator: Allocator) !
 
     const emoji_str = try allocator.dupe(u8, emoji_slice);
 
-    if (std.mem.indexOf(u8, line, "1F3FB") != null) {
-        try emoji.skin_tones[0].append(emoji_str);
-    }
-    if (std.mem.indexOf(u8, line, "1F3FC") != null) {
+    // handle combined emoji
+    // e.g. Handshake 🤝 has two skin tones like light skin tone, medium-light skin tone
+    // Zeff only consider the the first skin tone, which always includes trailling comma
+    if (std.mem.indexOf(u8, line, "medium-light skin tone,") != null) {
         try emoji.skin_tones[1].append(emoji_str);
+        return;
     }
-    if (std.mem.indexOf(u8, line, "1F3FD") != null) {
+    if (std.mem.indexOf(u8, line, "medium skin tone,") != null) {
         try emoji.skin_tones[2].append(emoji_str);
+        return;
     }
-    if (std.mem.indexOf(u8, line, "1F3FE") != null) {
+    if (std.mem.indexOf(u8, line, "medium-dark skin tone,") != null) {
         try emoji.skin_tones[3].append(emoji_str);
+        return;
     }
-    if (std.mem.indexOf(u8, line, "1F3FF") != null) {
+    // evaluate light/dark skin after medium-xxx skin.
+    if (std.mem.indexOf(u8, line, "light skin tone,") != null) {
+        try emoji.skin_tones[0].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, " dark skin tone,") != null) {
         try emoji.skin_tones[4].append(emoji_str);
+        return;
+    }
+
+    // simple skin tone emoji
+    if (std.mem.indexOf(u8, line, "medium-light skin tone") != null) {
+        try emoji.skin_tones[1].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, "medium skin tone") != null) {
+        try emoji.skin_tones[2].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, "medium-dark skin tone") != null) {
+        try emoji.skin_tones[3].append(emoji_str);
+        return;
+    }
+    // evaluate light/dark skin after medium-xxx skin.
+    if (std.mem.indexOf(u8, line, "light skin tone") != null) {
+        try emoji.skin_tones[0].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, "dark skin tone") != null) {
+        try emoji.skin_tones[4].append(emoji_str);
+        return;
     }
 }
 
