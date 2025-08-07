@@ -21,7 +21,7 @@ pub fn main() !void {
 
     if (selected_emoji != null) {
         const stdow = std.io.getStdOut().writer();
-        try stdow.print("{s}", .{selected_emoji.?.character});
+        try stdow.print("{s}", .{selected_emoji.?});
     }
 }
 

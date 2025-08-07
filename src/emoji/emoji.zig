@@ -26,7 +26,15 @@ pub const Emoji = struct {
 
         for (0..5) |i| {
             const skin_tones_str = parts.next() orelse "";
-            skin_tones_lists[i] = try splitStringToSlice(skin_tones_str, ",", allocator);
+            const skin_tones_slice = try splitStringToSlice(skin_tones_str, ",", allocator);
+
+            // TODO: This is only necessary as the gen-tsv handles skin tone in a different way
+            // Need to fix gen-tsv
+            if (skin_tones_slice.len < 5) {
+                skin_tones_lists[i] = skin_tones_slice;
+            } else {
+                skin_tones_lists[i] = skin_tones_slice[0..5];
+            }
         }
 
         defer {

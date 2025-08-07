@@ -7,39 +7,76 @@ const SearchResult = @import("../search/search.zig").SearchResult;
 const ztb = @import("ztb");
 
 pub const KeyHandleResult = union(enum) {
-    emoji: *const Emoji,
+    emoji: []const u8,
     finish_program,
     continue_processing,
 };
 
+pub const WindowFocused = enum {
+    main,
+    skin_tones,
+};
+
+pub const SkinToneType = enum {
+    default_only, // no skin tone variation
+    simple, // 1 default + 5 variations: light~dark
+    combined, // 1 default + 5 * 5 variations: e.g, Handshake 🤝 has light & light x 1, light & others x 4, others & light x 4
+};
+
+pub const SkinToneState = struct {
+    emoji: ?*const Emoji = null,
+    cursor_idx: u8 = 0,
+
+    cursor_max_idx: c_int = 0,
+    top_result_idx: usize = 0,
+    skin_tone_type: SkinToneType = .default_only,
+
+    max_visible_result: u8 = 10,
+
+    pub fn reset(self: *SkinToneState) void {
+        self.emoji = null;
+        self.cursor_idx = 0;
+        self.cursor_max_idx = 0;
+        self.top_result_idx = 0;
+        self.skin_tone_type = .default_only;
+    }
+};
+
 pub const State = struct {
+    window_focused: WindowFocused,
+    allocator: Allocator,
+    emojis: *const Emojis,
+
+    // Search Result
     cursor_idx: c_int,
     cursor_max_idx: c_int,
     top_result_idx: usize,
     results: []SearchResult,
-    emojis: *const Emojis,
-    input_buf: std.ArrayList(u8),
-
     max_visible_result: u8,
-    input_limit: u8,
     default_limit: u8,
 
-    allocator: Allocator,
+    // input
+    input_buf: std.ArrayList(u8),
+    input_limit: u8,
+
+    skin_tone: SkinToneState,
 
     pub fn init(emojis: *const Emojis, allocator: Allocator) !State {
         const input_buf = std.ArrayList(u8).init(allocator);
 
         return State{
+            .window_focused = WindowFocused.main,
             .cursor_idx = 0,
             .cursor_max_idx = 0,
             .top_result_idx = 0,
             .results = &.{},
-            .max_visible_result = 10,
-            .input_limit = 30,
-            .default_limit = 100,
             .emojis = emojis,
             .input_buf = input_buf,
             .allocator = allocator,
+            .max_visible_result = 10,
+            .default_limit = 100,
+            .input_limit = 30,
+            .skin_tone = SkinToneState{ .emoji = null, .cursor_idx = 0 },
         };
     }
 
@@ -51,7 +88,9 @@ pub const State = struct {
 pub fn handleKey(key: i32, state: *State) !KeyHandleResult {
     if (key == ztb.KEY_BACKSPACE or key == ztb.KEY_BACKSPACE2) {
         try handleDeleteKey(state);
-    } else if (isValidCharacter(key)) {
+    }
+
+    if (isValidCharacter(key)) {
         try handleAlphabet(state, key);
     }
 
@@ -62,10 +101,14 @@ pub fn handleKey(key: i32, state: *State) !KeyHandleResult {
         try handleArrowDown(state);
     }
 
+    if (key == '?') {
+        handleSkinTone(state);
+    }
+
     // handle Enter
     if (key == ztb.KEY_ENTER) {
         if (getSelectedEmoji(state)) |emoji| {
-            return KeyHandleResult{ .emoji = emoji };
+            return KeyHandleResult{ .emoji = emoji.character };
         }
     }
 
@@ -74,10 +117,26 @@ pub fn handleKey(key: i32, state: *State) !KeyHandleResult {
         return KeyHandleResult.finish_program;
     }
 
+    if (key == ztb.KEY_ESC) {
+        switch (state.window_focused) {
+            .main => {
+                return KeyHandleResult.finish_program;
+            },
+            .skin_tones => {
+                state.window_focused = .main;
+                state.skin_tone.reset();
+            },
+        }
+    }
+
     return KeyHandleResult.continue_processing;
 }
 
 fn handleDeleteKey(state: *State) !void {
+    if (state.window_focused != .main) {
+        return;
+    }
+
     if (state.input_buf.items.len > 0) {
         _ = state.input_buf.pop();
     }
@@ -86,6 +145,10 @@ fn handleDeleteKey(state: *State) !void {
 }
 
 fn handleAlphabet(state: *State, ch: i32) !void {
+    if (state.window_focused != WindowFocused.main) {
+        return;
+    }
+
     if (state.input_buf.items.len < state.input_limit) {
         try state.input_buf.append(@as(u8, @intCast(ch)));
     }
@@ -94,25 +157,86 @@ fn handleAlphabet(state: *State, ch: i32) !void {
 }
 
 fn handleArrowUp(state: *State) !void {
-    // Move cursor up
-    if (state.cursor_idx > 0) {
-        state.cursor_idx -= 1;
-    } else if (state.cursor_idx == 0 and state.top_result_idx > 0) {
-        state.top_result_idx = state.top_result_idx - 1;
+    switch (state.window_focused) {
+        .main => {
+            // Move cursor up
+            if (state.cursor_idx > 0) {
+                state.cursor_idx -= 1;
+            } else if (state.cursor_idx == 0 and state.top_result_idx > 0) {
+                state.top_result_idx = state.top_result_idx - 1;
+            }
+        },
+        .skin_tones => {
+            if (state.skin_tone.cursor_idx > 0) {
+                state.skin_tone.cursor_idx -= 1;
+            } else if (state.skin_tone.cursor_idx == 0 and state.skin_tone.top_result_idx > 0) {
+                state.skin_tone.top_result_idx = state.skin_tone.top_result_idx - 1;
+            }
+        },
     }
 }
 
 fn handleArrowDown(state: *State) !void {
-    if (state.results.len == 0 or state.cursor_idx >= state.results.len - 1) {
+    switch (state.window_focused) {
+        .main => {
+            if (state.results.len == 0 or state.cursor_idx >= state.results.len - 1) {
+                return;
+            }
+
+            const bottom_idx = state.top_result_idx + @as(usize, @intCast(state.cursor_max_idx));
+            if (state.cursor_idx == state.cursor_max_idx and state.results.len - 1 > bottom_idx) {
+                // scroll the result
+                state.top_result_idx += 1;
+            } else if (state.cursor_idx < state.cursor_max_idx) {
+                state.cursor_idx += 1;
+            }
+        },
+        .skin_tones => {
+            const skin_tone_num: usize = switch (state.skin_tone.skin_tone_type) {
+                .default_only => 1,
+                .simple => 5 + 1,
+                .combined => 25 + 1,
+            };
+
+            if (state.skin_tone.cursor_idx >= skin_tone_num - 1) {
+                return;
+            }
+
+            const bottom_idx = state.skin_tone.top_result_idx + @as(usize, @intCast(state.skin_tone.cursor_max_idx));
+            if (state.skin_tone.cursor_idx == state.skin_tone.cursor_max_idx and skin_tone_num - 1 > bottom_idx) {
+                // scroll the result
+                state.skin_tone.top_result_idx += 1;
+            } else if (state.skin_tone.cursor_idx < state.skin_tone.cursor_max_idx) {
+                state.skin_tone.cursor_idx += 1;
+            }
+        },
+    }
+}
+
+fn handleSkinTone(state: *State) void {
+    state.skin_tone.emoji = getSelectedEmoji(state);
+
+    if (state.skin_tone.emoji == null) {
         return;
     }
 
-    if (state.cursor_idx == state.cursor_max_idx and state.results.len - 1 > (state.top_result_idx + @as(usize, @intCast(state.cursor_idx)))) {
-        // scroll the result
-        state.top_result_idx += 1;
-    } else if (state.cursor_idx < state.cursor_max_idx) {
-        state.cursor_idx += 1;
+    switch (state.skin_tone.emoji.?.skin_tones[0].items.len) {
+        0 => {
+            state.skin_tone.skin_tone_type = SkinToneType.default_only;
+            state.skin_tone.cursor_max_idx = 0;
+        },
+        1 => {
+            state.skin_tone.skin_tone_type = .simple;
+            state.skin_tone.cursor_max_idx = 5;
+        },
+        5 => {
+            state.skin_tone.skin_tone_type = .combined;
+            state.skin_tone.cursor_max_idx = state.skin_tone.max_visible_result;
+        },
+        else => @panic("invalid skin tone length detected"),
     }
+
+    state.window_focused = WindowFocused.skin_tones;
 }
 
 fn getSelectedEmoji(state: *State) ?*const Emoji {
