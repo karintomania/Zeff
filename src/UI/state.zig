@@ -108,7 +108,29 @@ pub fn handleKey(key: i32, state: *State) !KeyHandleResult {
     // handle Enter
     if (key == ztb.KEY_ENTER) {
         if (getSelectedEmoji(state)) |emoji| {
-            return KeyHandleResult{ .emoji = emoji.character };
+            if (state.window_focused == .main) {
+                return KeyHandleResult{ .emoji = emoji.character };
+            } else {
+                const current_idx = state.skin_tone.cursor_idx;
+                const top_idx = state.skin_tone.top_result_idx;
+
+                const idx = top_idx + current_idx;
+                if (idx == 0) {
+                    return KeyHandleResult{ .emoji = emoji.character };
+                }
+                if (state.skin_tone.skin_tone_type == .simple) {
+                    const selected = emoji.skin_tones[idx - 1].items[0];
+
+                    return KeyHandleResult{ .emoji = selected };
+                } else if (state.skin_tone.skin_tone_type == .combined) {
+                    const prime_tone_idx = @divFloor(idx - 1, 5);
+                    const secondary_tone_idx = @rem(idx - 1, 5);
+
+                    const selected = emoji.skin_tones[prime_tone_idx].items[secondary_tone_idx];
+
+                    return KeyHandleResult{ .emoji = selected };
+                }
+            }
         }
     }
 
