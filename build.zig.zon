@@ -37,8 +37,8 @@
     // internet connectivity.
     .dependencies = .{
         .zig_termbox2_wrapper = .{
-            .url = "git+https://github.com/karintomania/zig-termbox2-wrapper#e5a93823e6cef2ed9dcfa9ae9eca61945e870128",
-            .hash = "zig_termbox2_wrapper-0.1.0-qgcgFushAwAKLb_tsQ23Bp5kmRH4W9AZ88giEFPKMzGS",
+            .url = "git+https://github.com/karintomania/zig-termbox2-wrapper#44584d1e2ea262e03c380f10416a2ba8fe48e38c",
+            .hash = "zig_termbox2_wrapper-0.1.0-qgcgFvckAwBsPrGC09SDjwu6D5OXxTi6h9Jpw5DF3aut",
         },
     },
     .paths = .{

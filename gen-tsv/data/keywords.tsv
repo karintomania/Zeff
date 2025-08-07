@@ -316,9 +316,9 @@
 🧑‍🔬	scientist	scientist,laboratory,research,experiment,science,discovery
 👨‍🔬	man scientist	man,scientist,laboratory,research,experiment,science,discovery,male
 👩‍🔬	woman scientist	woman,scientist,laboratory,research,experiment,science,discovery,female
-🧑‍💻	technologist	technologist,coder,programmer,developer,computer,tech
-👨‍💻	man technologist	man,technologist,coder,programmer,developer,computer,tech,male
-👩‍💻	woman technologist	woman,technologist,coder,programmer,developer,computer,tech,female
+🧑‍💻	technologist	technologist,coder,programmer,developer,software engineer,computer,tech
+👨‍💻	man technologist	man,technologist,coder,programmer,developer,software engineer,computer,tech,male
+👩‍💻	woman technologist	woman,technologist,coder,programmer,developer,software engineer,computer,tech,female
 🧑‍🎤	singer	singer,artist,music,microphone,perform,vocalist
 👨‍🎤	man singer	man,singer,artist,music,microphone,perform,vocalist,male
 👩‍🎤	woman singer	woman,singer,artist,music,microphone,perform,vocalist,female

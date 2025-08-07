@@ -1,7 +1,7 @@
 const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
-const Emoji = @import("emoji.zig").Emoji;
+const Emoji = @import("emoji").Emoji;
 const ArrayList = std.ArrayList;
 
 // inalid line includes empty lines and non-fully-qualified emojis
@@ -35,7 +35,7 @@ pub fn parseEmojiLine(
     var commentParts = std.mem.splitSequence(u8, comment, " ");
 
     const emoji_slice = commentParts.next() orelse @panic("No emoji found in line");
-    const emoji = try allocator.dupe(u8, emoji_slice);
+    const character = try allocator.dupe(u8, emoji_slice);
 
     // skip version
     _ = commentParts.next();
@@ -47,15 +47,15 @@ pub fn parseEmojiLine(
         descList.append(part) catch @panic("Failed to append to descList");
     }
 
-    const desc = std.mem.join(allocator, " ", descList.items) catch @panic("Failed to join desc");
+    const name = std.mem.join(allocator, " ", descList.items) catch @panic("Failed to join desc");
 
     const keywords = [_][]const u8{};
 
     return Emoji{
         .group = group,
         .subgroup = subgroup,
-        .emoji = emoji,
-        .desc = desc,
+        .character = character,
+        .name = name,
         .keywords = &keywords,
         .skin_tones = [5]ArrayList([]const u8){
             ArrayList([]const u8).init(allocator),
@@ -83,20 +83,52 @@ pub fn getSkinToneIndex(emoji: *Emoji, line: []const u8, allocator: Allocator) !
 
     const emoji_str = try allocator.dupe(u8, emoji_slice);
 
-    if (std.mem.indexOf(u8, line, "1F3FB") != null) {
-        try emoji.skin_tones[0].append(emoji_str);
-    }
-    if (std.mem.indexOf(u8, line, "1F3FC") != null) {
+    // handle combined emoji
+    // e.g. Handshake 🤝 has two skin tones like light skin tone, medium-light skin tone
+    // Zeff only consider the the first skin tone, which always includes trailling comma
+    if (std.mem.indexOf(u8, line, "medium-light skin tone,") != null) {
         try emoji.skin_tones[1].append(emoji_str);
+        return;
     }
-    if (std.mem.indexOf(u8, line, "1F3FD") != null) {
+    if (std.mem.indexOf(u8, line, "medium skin tone,") != null) {
         try emoji.skin_tones[2].append(emoji_str);
+        return;
     }
-    if (std.mem.indexOf(u8, line, "1F3FE") != null) {
+    if (std.mem.indexOf(u8, line, "medium-dark skin tone,") != null) {
         try emoji.skin_tones[3].append(emoji_str);
+        return;
     }
-    if (std.mem.indexOf(u8, line, "1F3FF") != null) {
+    // evaluate light/dark skin after medium-xxx skin.
+    if (std.mem.indexOf(u8, line, "light skin tone,") != null) {
+        try emoji.skin_tones[0].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, " dark skin tone,") != null) {
         try emoji.skin_tones[4].append(emoji_str);
+        return;
+    }
+
+    // simple skin tone emoji
+    if (std.mem.indexOf(u8, line, "medium-light skin tone") != null) {
+        try emoji.skin_tones[1].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, "medium skin tone") != null) {
+        try emoji.skin_tones[2].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, "medium-dark skin tone") != null) {
+        try emoji.skin_tones[3].append(emoji_str);
+        return;
+    }
+    // evaluate light/dark skin after medium-xxx skin.
+    if (std.mem.indexOf(u8, line, "light skin tone") != null) {
+        try emoji.skin_tones[0].append(emoji_str);
+        return;
+    }
+    if (std.mem.indexOf(u8, line, "dark skin tone") != null) {
+        try emoji.skin_tones[4].append(emoji_str);
+        return;
     }
 }
 
@@ -132,13 +164,13 @@ test "parseEmojiLine returns parsed Emoji" {
     const subgroup = "face-smiling";
 
     const res = try parseEmojiLine(group, subgroup, emojiLine, testing.allocator);
-    defer testing.allocator.free(res.emoji);
-    defer testing.allocator.free(res.desc);
+    defer testing.allocator.free(res.character);
+    defer testing.allocator.free(res.name);
 
     try testing.expectEqualStrings(group, res.group);
     try testing.expectEqualStrings(subgroup, res.subgroup);
-    try testing.expectEqualStrings("😀", res.emoji);
-    try testing.expectEqualStrings("grinning face", res.desc);
+    try testing.expectEqualStrings("😀", res.character);
+    try testing.expectEqualStrings("grinning face", res.name);
 }
 
 test "parseGroupLine returns group name" {

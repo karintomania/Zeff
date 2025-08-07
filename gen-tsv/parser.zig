@@ -2,7 +2,7 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
-const Emoji = @import("emoji.zig").Emoji;
+const Emoji = @import("emoji").Emoji;
 const emoji_line_handler = @import("emoji_line_handler.zig");
 const keywords_processor = @import("keywords_processor.zig");
 
@@ -37,12 +37,12 @@ pub const EmojiParser = struct {
         switch (lineType) {
             .emoji => {
                 const emoji = try emoji_line_handler.parseEmojiLine(self.group, self.subgroup, line, arena_allocator);
-                try self.map.put(emoji.emoji, emoji);
+                try self.map.put(emoji.character, emoji);
                 self.base_emoji = emoji;
             },
             .emoji_skin => {
                 try emoji_line_handler.getSkinToneIndex(&self.base_emoji, line, arena_allocator);
-                try self.map.put(self.base_emoji.emoji, self.base_emoji);
+                try self.map.put(self.base_emoji.character, self.base_emoji);
             },
             .group => {
                 const group_slice = emoji_line_handler.parseGroupLine(line);
@@ -59,11 +59,11 @@ pub const EmojiParser = struct {
     pub fn handleKeywordsLine(self: *EmojiParser, line: []const u8) !void {
         const emoji_keywords_pair = try keywords_processor.EmojiKeywordsPair.initFromLine(line, self.arena.allocator());
 
-        var emoji = self.map.get(emoji_keywords_pair.emoji) orelse @panic("emoji doesn't exist");
+        var emoji = self.map.get(emoji_keywords_pair.character) orelse @panic("emoji doesn't exist");
 
         emoji.keywords = emoji_keywords_pair.keywords;
 
-        try self.map.put(emoji.emoji, emoji);
+        try self.map.put(emoji.character, emoji);
     }
 
     pub fn deinit(self: *EmojiParser) void {
@@ -95,8 +95,8 @@ test "EmojiParser handles lines" {
     };
     try testing.expectEqualStrings("Smileys & Emotion", grinning.group);
     try testing.expectEqualStrings("face-smiling", grinning.subgroup);
-    try testing.expectEqualStrings("😀", grinning.emoji);
-    try testing.expectEqualStrings("grinning face", grinning.desc);
+    try testing.expectEqualStrings("😀", grinning.character);
+    try testing.expectEqualStrings("grinning face", grinning.name);
     try testing.expectEqual(0, grinning.keywords.len);
 
     const big_eye = parser.map.get("😶‍🌫️") orelse {
@@ -105,8 +105,8 @@ test "EmojiParser handles lines" {
     };
     try testing.expectEqualStrings("Smileys & Emotion", big_eye.group);
     try testing.expectEqualStrings("face-smiling", big_eye.subgroup);
-    try testing.expectEqualStrings("😶‍🌫️", big_eye.emoji);
-    try testing.expectEqualStrings("face in clouds", big_eye.desc);
+    try testing.expectEqualStrings("😶‍🌫️", big_eye.character);
+    try testing.expectEqualStrings("face in clouds", big_eye.name);
     try testing.expectEqual(0, big_eye.keywords.len);
 }
 
@@ -134,10 +134,9 @@ test "EmojiParser handles keywords lines" {
     };
     try testing.expectEqualStrings("Smileys & Emotion", grinning.group);
     try testing.expectEqualStrings("face-smiling", grinning.subgroup);
-    try testing.expectEqualStrings("😀", grinning.emoji);
-    try testing.expectEqualStrings("grinning face", grinning.desc);
+    try testing.expectEqualStrings("😀", grinning.character);
+    try testing.expectEqualStrings("grinning face", grinning.name);
     try testing.expectEqual(4, grinning.keywords.len);
-
 }
 
 test "EmojiParser handles skin tones" {
@@ -163,8 +162,8 @@ test "EmojiParser handles skin tones" {
     };
     try testing.expectEqualStrings("People & Body", base.group);
     try testing.expectEqualStrings("person-resting", base.subgroup);
-    try testing.expectEqualStrings("🧘", base.emoji);
-    try testing.expectEqualStrings("person in lotus position", base.desc);
+    try testing.expectEqualStrings("🧘", base.character);
+    try testing.expectEqualStrings("person in lotus position", base.name);
 
     const light_skin = base.skin_tones[0];
     try testing.expectEqual(1, light_skin.items.len);
@@ -174,4 +173,3 @@ test "EmojiParser handles skin tones" {
     try testing.expectEqual(1, medium_light_skin.items.len);
     try testing.expectEqualStrings("🧘🏼", medium_light_skin.items[0]);
 }
-
