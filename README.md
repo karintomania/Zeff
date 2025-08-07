@@ -4,6 +4,10 @@ Zeff is a blazing-fast command-line interface (CLI) tool that helps you quickly 
 
 ![Image](https://github.com/user-attachments/assets/bc67eb49-4f1d-41e5-affe-bcef479bdaa8)
 
+## Update at 2025/08/07 🎉
+Skin tone picker is added to Zeff ✋✋🏻✋🏽✋🏿  
+<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/8517da33-a90f-4259-9d2a-7b2b1982d868" />
+
 ---
 
 # Background
@@ -59,6 +63,6 @@ Zeff uses [termbox2](https://github.com/termbox/termbox2) internallly as a CLI l
 
 # TODOs
 - [ ] Improve keywords  
-- [ ] Skin tones  
+- [x] Skin tones  
 - [ ] Search history  
 
