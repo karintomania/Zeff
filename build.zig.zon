@@ -28,7 +28,7 @@
 
     // Tracks the earliest Zig version that the package considers to be a
     // supported use case.
-    .minimum_zig_version = "0.14.1",
+    .minimum_zig_version = "0.15.1",
 
     // This field is optional.
     // Each dependency must either provide a `url` and `hash`, or a `path`.
@@ -37,8 +37,8 @@
     // internet connectivity.
     .dependencies = .{
         .zig_termbox2_wrapper = .{
-            .url = "git+https://github.com/karintomania/zig-termbox2-wrapper#44584d1e2ea262e03c380f10416a2ba8fe48e38c",
-            .hash = "zig_termbox2_wrapper-0.1.0-qgcgFvckAwBsPrGC09SDjwu6D5OXxTi6h9Jpw5DF3aut",
+            .url = "git+https://github.com/karintomania/zig-termbox2-wrapper/#7e6fb1a611021fd96dd64411827720ffe6ff298a",
+            .hash = "zig_termbox2_wrapper-0.1.0-qgcgFpYlAwDv9E_dOnaKLMns9udYVqkL_Qxd2cdJNBvN",
         },
     },
     .paths = .{
