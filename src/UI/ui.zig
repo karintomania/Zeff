@@ -268,12 +268,12 @@ fn printEmoji(x: i32, y: i32, fg: u64, bg: u64, emoji: []const u8) !void {
     var buf: [256]u8 = undefined;
     var fba = std.heap.FixedBufferAllocator.init(&buf);
 
-    var utf32_sequence = std.ArrayList(u32).init(fba.allocator());
+    var utf32_sequence: std.ArrayList(u32) = .empty;
 
     var i: usize = 0;
     while (i < emoji.len) {
         const r = try ztb.utf8CharToUnicode(emoji[i..emoji.len]);
-        try utf32_sequence.append(r.unicode);
+        try utf32_sequence.append(fba.allocator(), r.unicode);
         i += @as(usize, @intCast(r.length));
     }
 

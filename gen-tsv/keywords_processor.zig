@@ -13,7 +13,7 @@ pub const EmojiKeywordsPair = struct {
 
         _ = tab_split.next(); // skip the description
 
-        var keywords_list = std.ArrayList([]const u8).init(allocator);
+        var keywords_list: std.ArrayList([]const u8) = .empty;
 
         const keywords_str = tab_split.next() orelse @panic("keywords expected");
 
@@ -22,12 +22,12 @@ pub const EmojiKeywordsPair = struct {
 
         while (keywords_split.next()) |keyword| {
             const keyword_allocated = try allocator.dupe(u8, keyword);
-            try keywords_list.append(keyword_allocated);
+            try keywords_list.append(allocator, keyword_allocated);
         }
 
         const emojiKeywords = EmojiKeywordsPair{
             .character = emoji,
-            .keywords = try keywords_list.toOwnedSlice(),
+            .keywords = try keywords_list.toOwnedSlice(allocator),
         };
 
         return emojiKeywords;

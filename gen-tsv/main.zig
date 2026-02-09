@@ -23,40 +23,41 @@ pub fn main() !void {
 
     const result_file = try std.fs.cwd().openFile(output_path, std.fs.File.OpenFlags{ .mode = std.fs.File.OpenMode.write_only });
 
-    const writer = result_file.writer();
+    var buf: [8192]u8 = undefined;
+
+    var file_writer = result_file.writer(&buf);
+    const writer = &file_writer.interface;
 
     // iterate emojiParser.map
     var iterator = emojiParser.map.iterator();
     while (iterator.next()) |entry| {
         const emoji = entry.value_ptr.*;
-        try writer.print("{any}\n", .{emoji});
+        try writer.print("{f}\n", .{emoji});
     }
 }
 
 fn readEmojiFile(emojiParser: *parser.EmojiParser) !void {
     const emoji_file = try std.fs.cwd().openFile(input_emoji_path, .{});
-    const reader = emoji_file.reader();
 
-    var buf_reader = std.io.bufferedReader(reader);
-    const in_stream = buf_reader.reader();
+    var buffer: [2048]u8 = undefined;
 
-    var buffer: [1024]u8 = undefined;
+    var file_reader = emoji_file.reader(&buffer);
+    const reader = &file_reader.interface;
 
-    while (try in_stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
+    while (reader.takeDelimiterExclusive('\n') catch null) |line| {
         try emojiParser.handleEmojiLine(line);
     }
 }
 
 fn readKeywordsFile(emojiParser: *parser.EmojiParser) !void {
     const keywords_file = try std.fs.cwd().openFile(input_keywords_path, .{});
-    const reader = keywords_file.reader();
 
-    var buf_reader = std.io.bufferedReader(reader);
-    const in_stream = buf_reader.reader();
+    var buffer: [2048]u8 = undefined;
+    var reader = keywords_file.reader(&buffer);
 
-    var buffer: [1024]u8 = undefined;
+    const in_stream = &reader.interface;
 
-    while (try in_stream.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
+    while (in_stream.takeDelimiterExclusive('\n') catch null) |line| {
         try emojiParser.handleKeywordsLine(line);
     }
 }

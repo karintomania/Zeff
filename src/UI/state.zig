@@ -62,7 +62,7 @@ pub const State = struct {
     skin_tone: SkinToneState,
 
     pub fn init(emojis: *const Emojis, allocator: Allocator) !State {
-        const input_buf = std.ArrayList(u8).init(allocator);
+        const input_buf: std.ArrayList(u8) = .empty;
 
         return State{
             .window_focused = WindowFocused.main,
@@ -81,7 +81,7 @@ pub const State = struct {
     }
 
     pub fn deinit(self: *State) void {
-        self.input_buf.deinit();
+        self.input_buf.deinit(self.allocator);
     }
 };
 
@@ -172,7 +172,7 @@ fn handleAlphabet(state: *State, ch: i32) !void {
     }
 
     if (state.input_buf.items.len < state.input_limit) {
-        try state.input_buf.append(@as(u8, @intCast(ch)));
+        try state.input_buf.append(state.allocator, @as(u8, @intCast(ch)));
     }
 
     try updateQuery(state);

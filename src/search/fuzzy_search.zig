@@ -42,14 +42,14 @@ pub fn fuzzy_search(query: []const u8, str: []const u8) !i16 {
 }
 
 fn lowerCaseString(str: []const u8, allocator: Allocator) ![]const u8 {
-    var lower = std.ArrayList(u8).init(allocator);
-    errdefer lower.deinit();
+    var lower: std.ArrayList(u8) = .empty;
+    errdefer lower.deinit(allocator);
 
     for (str) |c| {
-        try lower.append(std.ascii.toLower(c));
+        try lower.append(allocator, std.ascii.toLower(c));
     }
 
-    return lower.toOwnedSlice();
+    return lower.toOwnedSlice(allocator);
 }
 
 fn recursive_match(query: []const u8, str: []const u8, before_str: ?u8, score: i16, is_first_char: bool) i16 {
