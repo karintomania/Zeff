@@ -20,8 +20,12 @@ pub fn main() !void {
     const selected_emoji = try startUI(&emojis, allocator);
 
     if (selected_emoji != null) {
-        const stdow = std.io.getStdOut().writer();
-        try stdow.print("{s}", .{selected_emoji.?});
+        var stdo_buf: [32]u8 = undefined;
+        var stdow = std.fs.File.stdout().writer(&stdo_buf);
+        const stdout = &stdow.interface;
+
+        try stdout.print("{s}", .{selected_emoji.?});
+        try stdout.flush();
     }
 }
 

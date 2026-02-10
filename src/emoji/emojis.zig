@@ -25,16 +25,16 @@ pub const Emojis = struct {
 
 fn getEmojiSlice(allocator: Allocator) ![]const Emoji {
     var lines = std.mem.splitSequence(u8, input_str, "\n");
-    var emojis_list = std.ArrayList(Emoji).init(allocator);
+    var emojis_list: std.ArrayList(Emoji) = .empty;
 
     while (lines.next()) |line| {
         if (line.len == 0) continue; // Skip empty lines
 
         const emoji = try Emoji.fromLine(line, allocator);
-        try emojis_list.append(emoji);
+        try emojis_list.append(allocator, emoji);
     }
 
-    return emojis_list.toOwnedSlice();
+    return emojis_list.toOwnedSlice(allocator);
 }
 
 test "getEmojiSlice" {

@@ -61,12 +61,11 @@ pub const Emoji = struct {
         }
 
         // Initialize skin tones arrays
-        var skin_tones = [_]ArrayList([]const u8){undefined} ** 5;
+        var skin_tones = [_]ArrayList([]const u8){.empty} ** 5;
         for (0..5) |i| {
-            skin_tones[i] = ArrayList([]const u8).init(allocator);
             for (skin_tones_lists[i]) |skin_tone| {
-                const allocated_skin_tone = try allocator.dupe(u8, skin_tone);
-                try skin_tones[i].append(allocated_skin_tone);
+                // const allocated_skin_tone = try allocator.dupe(u8, skin_tone);
+                try skin_tones[i].append(allocator, skin_tone);
             }
         }
 
@@ -80,10 +79,7 @@ pub const Emoji = struct {
         };
     }
 
-    pub fn format(value: Emoji, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
-        _ = fmt;
-        _ = options;
-
+    pub fn format(value: Emoji, writer: anytype) !void {
         try writer.print("{s}\t{s}\t{s}\t{s}\t", .{
             value.character,
             value.group,
@@ -123,10 +119,7 @@ pub const Emoji = struct {
         }
 
         for (self.skin_tones) |skin_tone| {
-            for (skin_tone.items) |skin_tone_emoji| {
-                allocator.free(skin_tone_emoji);
-            }
-            skin_tone.deinit();
+            allocator.free(skin_tone.allocatedSlice());
         }
 
         allocator.free(self.keywords);
@@ -136,15 +129,15 @@ pub const Emoji = struct {
 fn splitStringToSlice(str: []const u8, delimiter: []const u8, allocator: Allocator) ![]const []const u8 {
     var parts = std.mem.splitSequence(u8, str, delimiter);
 
-    var list = ArrayList([]const u8).init(allocator);
-    defer list.deinit();
+    var list: ArrayList([]const u8) = .empty;
+    // defer list.deinit();
 
     while (parts.next()) |part| {
         if (part.len == 0) continue; // Skip empty parts
-        try list.append(part);
+        try list.append(allocator, part);
     }
 
-    return list.toOwnedSlice();
+    return list.toOwnedSlice(allocator);
 }
 
 test "splitStringToArrayList" {
@@ -266,13 +259,13 @@ test "Emoji format function" {
         .subgroup = "face-smiling",
         .name = "grinning face",
         .keywords = &keywords,
-        .skin_tones = [_]ArrayList([]const u8){ArrayList([]const u8).init(std.testing.allocator)} ** 5,
+        .skin_tones = [_]ArrayList([]const u8){.empty} ** 5,
     };
 
-    var buffer = std.ArrayList(u8).init(std.testing.allocator);
-    defer buffer.deinit();
+    var buffer: std.ArrayList(u8) = .empty;
 
-    try std.fmt.format(buffer.writer(), "{}", .{emoji});
+    try std.fmt.format(buffer.writer(std.testing.allocator), "{f}", .{emoji});
+    defer buffer.deinit(std.testing.allocator);
 
     const expected = "😀\tSmileys & Emotion\tface-smiling\tgrinning face\thappy,smile\t";
     try std.testing.expectEqualStrings(expected, buffer.items);

@@ -14,8 +14,8 @@ pub const SearchResult = struct {
 };
 
 pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Allocator) ![]SearchResult {
-    var results = std.ArrayList(SearchResult).init(allocator);
-    errdefer results.deinit();
+    var results: ArrayList(SearchResult) = .empty;
+    errdefer results.deinit(allocator);
 
     for (emojis) |*emoji| {
         const best = getEmojiScore(emoji.*, query);
@@ -23,7 +23,7 @@ pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Al
         const label = best.label;
 
         if (score > 0) {
-            try results.append(SearchResult{
+            try results.append(allocator, SearchResult{
                 .emoji = emoji,
                 .label = label,
                 .score = score,
@@ -36,7 +36,7 @@ pub fn search(query: []const u8, limit: u8, emojis: []const Emoji, allocator: Al
     // Resize to limit before converting to owned slice
     results.shrinkRetainingCapacity(@min(results.items.len, limit));
 
-    return try results.toOwnedSlice();
+    return try results.toOwnedSlice(allocator);
 }
 
 fn getEmojiScore(emoji: Emoji, query: []const u8) struct { score: i16, label: []const u8 } {
