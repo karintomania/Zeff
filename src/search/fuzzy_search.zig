@@ -18,14 +18,18 @@ const initial_score: i16 = 100;
 const no_match_score: i16 = -1000;
 
 pub fn fuzzy_search(query: []const u8, str: []const u8) !i16 {
-    var buffer: [1024]u8 = undefined;
-    var fba = std.heap.FixedBufferAllocator.init(&buffer);
+    var buf: [2048]u8 = undefined;
+
+    var fba = std.heap.FixedBufferAllocator.init(&buf);
     const allocator = fba.allocator();
 
-    const query_lower = try lowerCaseString(query, allocator);
-    defer allocator.free(query_lower);
-    const str_lower = try lowerCaseString(str, allocator);
-    defer allocator.free(str_lower);
+    const query_lower = try allocator.alloc(u8, query.len);
+
+    lowerCaseString(query, query_lower);
+
+    const str_lower = try allocator.alloc(u8, str.len);
+
+    lowerCaseString(str, str_lower);
 
     if (query.len == 0) {
         return initial_score; // empty query matches everything
@@ -41,15 +45,12 @@ pub fn fuzzy_search(query: []const u8, str: []const u8) !i16 {
     return recursive_match(query_lower, str_lower, null, score, true);
 }
 
-fn lowerCaseString(str: []const u8, allocator: Allocator) ![]const u8 {
-    var lower: std.ArrayList(u8) = .empty;
-    errdefer lower.deinit(allocator);
+fn lowerCaseString(str: []const u8, out: []u8) void {
+    if (str.len != out.len) @panic("length of str and out should be the same.");
 
-    for (str) |c| {
-        try lower.append(allocator, std.ascii.toLower(c));
+    for (str, 0..) |c, i| {
+        out[i] = std.ascii.toLower(c);
     }
-
-    return lower.toOwnedSlice(allocator);
 }
 
 fn recursive_match(query: []const u8, str: []const u8, before_str: ?u8, score: i16, is_first_char: bool) i16 {
