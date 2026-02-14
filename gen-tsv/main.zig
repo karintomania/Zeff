@@ -34,6 +34,8 @@ pub fn main() !void {
         const emoji = entry.value_ptr.*;
         try writer.print("{f}\n", .{emoji});
     }
+
+    try writer.flush();
 }
 
 fn readEmojiFile(emojiParser: *parser.EmojiParser) !void {

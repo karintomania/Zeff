@@ -119,14 +119,14 @@ pub fn handleKey(key: i32, state: *State) !KeyHandleResult {
                     return KeyHandleResult{ .emoji = emoji.character };
                 }
                 if (state.skin_tone.skin_tone_type == .simple) {
-                    const selected = emoji.skin_tones[idx - 1].items[0];
+                    const selected = emoji.skin_tones[idx - 1][0];
 
                     return KeyHandleResult{ .emoji = selected };
                 } else if (state.skin_tone.skin_tone_type == .combined) {
                     const prime_tone_idx = @divFloor(idx - 1, 5);
                     const secondary_tone_idx = @rem(idx - 1, 5);
 
-                    const selected = emoji.skin_tones[prime_tone_idx].items[secondary_tone_idx];
+                    const selected = emoji.skin_tones[prime_tone_idx][secondary_tone_idx];
 
                     return KeyHandleResult{ .emoji = selected };
                 }
@@ -242,7 +242,7 @@ fn handleSkinTone(state: *State) void {
         return;
     }
 
-    switch (state.skin_tone.emoji.?.skin_tones[0].items.len) {
+    switch (state.skin_tone.emoji.?.skin_tones[0].len) {
         0 => {
             state.skin_tone.skin_tone_type = SkinToneType.default_only;
             state.skin_tone.cursor_max_idx = 0;
@@ -274,6 +274,8 @@ fn getSelectedEmoji(state: *State) ?*const Emoji {
 }
 
 fn updateQuery(state: *State) !void {
+    // TODO: in the first call, results are not heap-allocated.
+    // Change results to nullable maybe?
     state.allocator.free(state.results);
 
     const query = state.input_buf.items;

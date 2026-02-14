@@ -57,13 +57,7 @@ pub fn parseEmojiLine(
         .character = character,
         .name = name,
         .keywords = &keywords,
-        .skin_tones = [5]ArrayList([]const u8){
-            ArrayList([]const u8).empty,
-            ArrayList([]const u8).empty,
-            ArrayList([]const u8).empty,
-            ArrayList([]const u8).empty,
-            ArrayList([]const u8).empty,
-        },
+        .skin_tones = [1][]const []const u8{&.{}} ** 5,
     };
 }
 
@@ -73,7 +67,7 @@ pub fn parseEmojiLine(
 // 2 - mid
 // 3 - mid-dark
 // 4 - dark
-pub fn getSkinToneIndex(emoji: *Emoji, line: []const u8, allocator: Allocator) !void {
+pub fn getSkinToneIndex(skin: *[5]ArrayList([]const u8), line: []const u8, allocator: Allocator) !void {
     const commentIndex = std.mem.indexOf(u8, line, "#") orelse @panic("failed to parse");
     const comment = std.mem.trim(u8, line[commentIndex + 1 ..], " ");
 
@@ -87,47 +81,47 @@ pub fn getSkinToneIndex(emoji: *Emoji, line: []const u8, allocator: Allocator) !
     // e.g. Handshake 🤝 has two skin tones like light skin tone, medium-light skin tone
     // Zeff only consider the the first skin tone, which always includes trailling comma
     if (std.mem.indexOf(u8, line, "medium-light skin tone,") != null) {
-        try emoji.skin_tones[1].append(allocator, emoji_str);
+        try skin[1].append(allocator, emoji_str);
         return;
     }
     if (std.mem.indexOf(u8, line, "medium skin tone,") != null) {
-        try emoji.skin_tones[2].append(allocator, emoji_str);
+        try skin[2].append(allocator, emoji_str);
         return;
     }
     if (std.mem.indexOf(u8, line, "medium-dark skin tone,") != null) {
-        try emoji.skin_tones[3].append(allocator, emoji_str);
+        try skin[3].append(allocator, emoji_str);
         return;
     }
     // evaluate light/dark skin after medium-xxx skin.
     if (std.mem.indexOf(u8, line, "light skin tone,") != null) {
-        try emoji.skin_tones[0].append(allocator, emoji_str);
+        try skin[0].append(allocator, emoji_str);
         return;
     }
     if (std.mem.indexOf(u8, line, " dark skin tone,") != null) {
-        try emoji.skin_tones[4].append(allocator, emoji_str);
+        try skin[4].append(allocator, emoji_str);
         return;
     }
 
     // simple skin tone emoji
     if (std.mem.indexOf(u8, line, "medium-light skin tone") != null) {
-        try emoji.skin_tones[1].append(allocator, emoji_str);
+        try skin[1].append(allocator, emoji_str);
         return;
     }
     if (std.mem.indexOf(u8, line, "medium skin tone") != null) {
-        try emoji.skin_tones[2].append(allocator, emoji_str);
+        try skin[2].append(allocator, emoji_str);
         return;
     }
     if (std.mem.indexOf(u8, line, "medium-dark skin tone") != null) {
-        try emoji.skin_tones[3].append(allocator, emoji_str);
+        try skin[3].append(allocator, emoji_str);
         return;
     }
     // evaluate light/dark skin after medium-xxx skin.
     if (std.mem.indexOf(u8, line, "light skin tone") != null) {
-        try emoji.skin_tones[0].append(allocator, emoji_str);
+        try skin[0].append(allocator, emoji_str);
         return;
     }
     if (std.mem.indexOf(u8, line, "dark skin tone") != null) {
-        try emoji.skin_tones[4].append(allocator, emoji_str);
+        try skin[4].append(allocator, emoji_str);
         return;
     }
 }

@@ -10,6 +10,7 @@ pub const EmojiParser = struct {
     group: []const u8,
     subgroup: []const u8,
     base_emoji: Emoji, // store the base emoji for skin tones
+    skin_tones: [5]ArrayList([]const u8),
     arena: std.heap.ArenaAllocator,
     allocator: Allocator,
     map: std.StringArrayHashMap(Emoji),
@@ -21,6 +22,7 @@ pub const EmojiParser = struct {
             .group = "",
             .subgroup = "",
             .base_emoji = undefined,
+            .skin_tones = [1]ArrayList([]const u8){.empty} ** 5,
             .arena = arena,
             .allocator = allocator,
             .map = std.StringArrayHashMap(Emoji).init(allocator),
@@ -36,13 +38,14 @@ pub const EmojiParser = struct {
 
         switch (lineType) {
             .emoji => {
+                if (self.skin_tones[0].items.len > 0) try self.handleSkinTone();
+
                 const emoji = try emoji_line_handler.parseEmojiLine(self.group, self.subgroup, line, arena_allocator);
                 try self.map.put(emoji.character, emoji);
                 self.base_emoji = emoji;
             },
             .emoji_skin => {
-                try emoji_line_handler.getSkinToneIndex(&self.base_emoji, line, arena_allocator);
-                try self.map.put(self.base_emoji.character, self.base_emoji);
+                try emoji_line_handler.getSkinToneIndex(&self.skin_tones, line, arena_allocator);
             },
             .group => {
                 const group_slice = emoji_line_handler.parseGroupLine(line);
@@ -64,6 +67,14 @@ pub const EmojiParser = struct {
         emoji.keywords = emoji_keywords_pair.keywords;
 
         try self.map.put(emoji.character, emoji);
+    }
+
+    fn handleSkinTone(self: *EmojiParser) !void {
+        for (0..5) |i| {
+            self.base_emoji.skin_tones[i] = try self.skin_tones[i].toOwnedSlice(self.arena.allocator());
+        }
+
+        try self.map.put(self.base_emoji.character, self.base_emoji);
     }
 
     pub fn deinit(self: *EmojiParser) void {

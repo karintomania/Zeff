@@ -162,7 +162,7 @@ const winSkinTone = struct {
             idx += 1;
 
             for (emoji.skin_tones, 0..) |skin_tone, i| {
-                for (skin_tone.items, 0..) |em, j| {
+                for (skin_tone, 0..) |em, j| {
                     if (idx >= state.skin_tone.top_result_idx and idx <= state.skin_tone.top_result_idx + state.skin_tone.max_visible_result) {
                         const current_idx = state.skin_tone.cursor_idx + state.skin_tone.top_result_idx;
 
