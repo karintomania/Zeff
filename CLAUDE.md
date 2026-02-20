@@ -66,7 +66,7 @@ The `Emoji` struct uses dynamic allocation for keywords and skin tones arrays. A
 ## Build Configuration
 
 - Uses Zig's standard build system with `build.zig`
-- Minimum Zig version: 0.14.1
+- Minimum Zig version: 0.15.1
 - Package name: `emoji_finider`
 - Builds executable named `emoji_finider`
 - Includes unit tests for core functionality

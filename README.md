@@ -55,7 +55,7 @@ Pre-built bninaries for Linux (x86_64) and macOS (arm64) is available from the [
 ### Build from source
 Clone this repo and run `make build`. The binary will be in `zig-out/bin/zeff`.
 
-**Note:** You need zig v0.14.1 to build.
+**Note:** You need zig v0.15.1 to build.
 
 # Special Thanks!
 The fuzzy search algorithm is heavily inspired by this excellent repo: https://github.com/philj56/fuzzy-match by @philj56.  
